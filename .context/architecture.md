@@ -8,6 +8,7 @@
 - TanStack Route
 - Lucide Icon
 - Zustand
+- Shadcn
 
 ## Avoid
 
@@ -22,7 +23,7 @@
 - Avoid tailwind arbitary css classname
 - Done over styling
 
-# Coding style
+# Coding Style
 
 - Use functional programming where possible
 - Never generate code without type safety
@@ -42,3 +43,9 @@
 
 - / -> home main
 - /n/:id -> notes
+
+## Folder Structure
+
+- src/routes -> pages
+- src/components/ui -> atomic component (e.g, button, input)
+- src/components/layout -> layout level UI (e.g, navbar)
