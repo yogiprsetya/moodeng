@@ -1,13 +1,13 @@
-# Editor
+# Workspace
 
-User setting
+Personal user setting
 
 ```
 {
   "clientId": "uuid",
   "theme": "string",
-  "darkMode": "boolean",
-  "workspace": "string", -> editor name
+  "darkmode": "boolean",
+  "title": "string", -> editor name
 }
 ```
 

@@ -37,3 +37,8 @@
 # Notes
 
 - Project is micro SaaS: focus on simplicity
+
+## Routes
+
+- / -> home main
+- /n/:id -> notes

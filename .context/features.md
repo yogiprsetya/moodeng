@@ -22,10 +22,18 @@
 - Left: button sync and sync alert
 - Toolbar
 
-## Feature
+## UI Interaction
 
 - Empty state
 - Loading state
-- Theme change
-- Darkmode
-- Title bar: based-on user setting "editor.workspace" if available
+- Theme change: "workspace.theme"
+- Darkmode: "workspace.darkmode"
+- Title bar: "workspace.title" if available
+- Optimistic update
+- Optimistic rollback
+- Sync screen: wait until local data loaded
+
+## Popup
+
+- Manage folder
+- Setting persolaize
