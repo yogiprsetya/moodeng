@@ -10,7 +10,8 @@
 
 - List of notes
 - Filter by folder
-- search by title
+- Search by title
+- User can pin notes
 
 ### Main
 
@@ -31,7 +32,7 @@
 - Title bar: "workspace.title" if available
 - Optimistic update
 - Optimistic rollback
-- Sync screen: wait until local data loaded
+- Splash screen: wait until local data loaded
 
 ## Popup
 

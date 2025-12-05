@@ -29,6 +29,7 @@
 - Never generate code without type safety
 - Use hook
 - Prefer kebab-case for file and folder naming
+- Avoid `import * as React from "react"`
 
 # Patterns
 
