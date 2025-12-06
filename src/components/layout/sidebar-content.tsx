@@ -112,7 +112,6 @@ export function SidebarContent() {
                     asChild
                     isActive={currentNoteId === note.id}
                     tooltip={note.title}
-                    className="transition-all"
                   >
                     <Link to="/n/$id" params={{ id: note.id }}>
                       <span className="truncate font-normal">{note.title}</span>

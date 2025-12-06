@@ -10,11 +10,13 @@ export function Topbar() {
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl supports-backdrop-filter:bg-background/60">
-      <div className="flex h-14 items-center justify-between gap-4 px-4">
+    <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur-md supports-backdrop-filter:bg-background/80">
+      <div className="flex h-12 items-center justify-between gap-4 px-6">
         {/* Left: App title or branding */}
         <div className="flex items-center gap-2">
-          <h1 className="text-sm font-semibold text-foreground/90">Moodeng</h1>
+          <h1 className="text-sm font-semibold text-foreground tracking-tight">
+            Moodeng
+          </h1>
         </div>
 
         {/* Right: Theme selector, Sync button and sync alert */}
@@ -24,7 +26,7 @@ export function Topbar() {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8"
+            className="h-8 w-8 rounded-lg"
             onClick={() => {
               // TODO: Implement sync logic
               setSyncStatus("syncing");
@@ -46,7 +48,7 @@ export function Topbar() {
             <div
               className={cn(
                 "flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs",
-                "bg-destructive/10 text-destructive border border-destructive/20"
+                "bg-destructive/10 text-destructive border border-destructive/20 shadow-sm"
               )}
             >
               <AlertCircle className="size-3" />

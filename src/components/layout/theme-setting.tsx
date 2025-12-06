@@ -47,7 +47,7 @@ export function ThemeSetting() {
           </SheetDescription>
         </SheetHeader>
 
-        <div className="mt-6 space-y-6 px-4">
+        <div className="mt-8 space-y-8 px-4">
           {/* Color Scheme Selection */}
           <div>
             <h3 className="text-sm font-medium mb-3">Color Scheme</h3>
@@ -61,10 +61,10 @@ export function ThemeSetting() {
                     key={option.value}
                     onClick={() => setColorScheme(option.value)}
                     className={cn(
-                      "flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border transition-all",
-                      "hover:bg-accent hover:border-accent-foreground/20",
+                      "flex-1 flex flex-col items-center gap-2 p-3 rounded-lg border transition-all shadow-sm",
+                      "hover:bg-accent hover:border-accent-foreground/20 hover:shadow-md active:scale-[0.98]",
                       colorScheme === option.value
-                        ? "bg-accent border-accent-foreground/30"
+                        ? "bg-accent border-accent-foreground/30 ring-2 ring-ring/50"
                         : "border-border bg-background"
                     )}
                   >
@@ -93,10 +93,10 @@ export function ThemeSetting() {
                         setTheme(theme.name);
                       }}
                       className={cn(
-                        "flex flex-col items-start gap-2 p-3 rounded-lg border transition-all text-left",
-                        "hover:bg-accent hover:border-accent-foreground/20",
+                        "flex flex-col items-start gap-2 p-3 rounded-lg border transition-all text-left shadow-sm",
+                        "hover:bg-accent hover:border-accent-foreground/20 hover:shadow-md active:scale-[0.98]",
                         isSelected
-                          ? "bg-accent border-accent-foreground/30 ring-2 ring-ring"
+                          ? "bg-accent border-accent-foreground/30 ring-2 ring-ring/50"
                           : "border-border bg-background"
                       )}
                     >
