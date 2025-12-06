@@ -27,7 +27,7 @@ export const AppLayout: FC<{ children: ReactNode }> = ({ children }) => (
 
         <SidebarInset className="flex flex-col bg-background">
           <main className="flex flex-1 flex-col overflow-auto">
-            <div className="container mx-auto max-w-4xl px-8 py-10">
+            <div className="container mx-auto max-w-5xl px-8 py-10">
               {children}
             </div>
           </main>

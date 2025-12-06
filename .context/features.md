@@ -39,3 +39,8 @@
 
 - Manage folder
 - Setting persolaize
+
+# Editor
+
+- Include all basic formating
+- Editor can detect existing format prevent double format
