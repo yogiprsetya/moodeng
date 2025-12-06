@@ -14,7 +14,7 @@ export function Topbar() {
       <div className="flex h-12 items-center justify-between gap-4 px-6">
         {/* Left: App title or branding */}
         <div className="flex items-center gap-2">
-          <h1 className="text-sm font-semibold text-foreground tracking-tight">
+          <h1 className="font-semibold text-foreground tracking-tight">
             Moodeng
           </h1>
         </div>

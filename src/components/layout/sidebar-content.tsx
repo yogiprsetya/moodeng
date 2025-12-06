@@ -100,7 +100,7 @@ export function SidebarContent() {
         <SidebarGroupContent>
           <SidebarMenu>
             {filteredNotes.length === 0 ? (
-              <div className="px-3 py-6 text-center text-sm text-muted-foreground">
+              <div className="px-3 py-6 text-center text-muted-foreground">
                 {searchQuery || selectedFolder
                   ? "No notes found"
                   : "No notes yet"}

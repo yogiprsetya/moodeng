@@ -50,7 +50,7 @@ export function ThemeSetting() {
         <div className="mt-8 space-y-8 px-4">
           {/* Color Scheme Selection */}
           <div>
-            <h3 className="text-sm font-medium mb-3">Color Scheme</h3>
+            <h3 className="font-medium mb-3">Color Scheme</h3>
 
             <div className="flex gap-2">
               {colorSchemeOptions.map((option) => {
@@ -78,7 +78,7 @@ export function ThemeSetting() {
 
           {/* Theme Selection */}
           <div>
-            <h3 className="text-sm font-medium mb-3">Theme</h3>
+            <h3 className="font-medium mb-3">Theme</h3>
 
             <div className="grid grid-cols-2 gap-2">
               {(Object.values(themes) as (typeof themes)[ThemeName][]).map(
@@ -101,9 +101,7 @@ export function ThemeSetting() {
                       )}
                     >
                       <div className="flex items-center justify-between w-full">
-                        <span className="text-sm font-medium">
-                          {theme.displayName}
-                        </span>
+                        <span className="font-medium">{theme.displayName}</span>
 
                         {isDarkTheme && (
                           <Moon className="size-4 text-muted-foreground" />

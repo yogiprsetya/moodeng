@@ -1,11 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
+import { MarkdownEditor } from "~/components/editor/markdown-editor";
 
 export const Route = createFileRoute("/n/$id")({
   component: NotePage,
 });
 
 function NotePage() {
-  const { id } = Route.useParams();
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { id: _id } = Route.useParams();
+  const [content, setContent] = useState("");
 
   return (
     <div className="flex flex-col gap-6">
@@ -13,12 +17,9 @@ function NotePage() {
         <h1 className="text-3xl font-semibold text-foreground tracking-tight">
           Note
         </h1>
-        <p className="text-sm text-muted-foreground">Note ID: {id}</p>
       </div>
 
-      <div className="rounded-xl border border-border/50 bg-card p-8 min-h-[400px] shadow-sm">
-        <p className="text-muted-foreground">Start editing your note...</p>
-      </div>
+      <MarkdownEditor value={content} onChange={setContent} />
     </div>
   );
 }

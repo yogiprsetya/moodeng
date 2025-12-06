@@ -12,6 +12,7 @@
 - Filter by folder
 - Search by title
 - User can pin notes
+- User can click read-only hover effect (render markdown format)
 
 ### Main
 
