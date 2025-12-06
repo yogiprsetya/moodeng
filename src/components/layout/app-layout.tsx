@@ -8,31 +8,31 @@ import {
 } from "~/components/ui/sidebar";
 import { Topbar } from "~/components/layout/topbar";
 import { SidebarContent as NotesSidebarContent } from "~/components/layout/sidebar-content";
-import type { ReactNode } from "react";
+import type { FC, ReactNode } from "react";
 
-export function AppLayout({ children }: { children: ReactNode }) {
-  return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full flex-col">
-        <Topbar />
+export const AppLayout: FC<{ children: ReactNode }> = ({ children }) => (
+  <SidebarProvider>
+    <div className="flex min-h-screen w-full flex-col bg-background">
+      <Topbar />
 
-        <div className="flex flex-1">
-          <Sidebar>
-            <SidebarHeader>
-              <SidebarTrigger />
-            </SidebarHeader>
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar>
+          <SidebarHeader className="border-b border-sidebar-border/40">
+            <SidebarTrigger />
+          </SidebarHeader>
 
-            <NotesSidebarContent />
-            <SidebarRail />
-          </Sidebar>
+          <NotesSidebarContent />
+          <SidebarRail />
+        </Sidebar>
 
-          <SidebarInset className="flex flex-col">
-            <main className="flex flex-1 flex-col overflow-auto">
+        <SidebarInset className="flex flex-col bg-background/50">
+          <main className="flex flex-1 flex-col overflow-auto">
+            <div className="container mx-auto max-w-4xl px-6 py-8">
               {children}
-            </main>
-          </SidebarInset>
-        </div>
+            </div>
+          </main>
+        </SidebarInset>
       </div>
-    </SidebarProvider>
-  );
-}
+    </div>
+  </SidebarProvider>
+);

@@ -3,5 +3,5 @@
 - Easy to understand
 - User can choose ready-to-use theme
 - Dark mode support
-- Inpired by apple notes
+- Inpired by Trello
 - Satisfying UI style

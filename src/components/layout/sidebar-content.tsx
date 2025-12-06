@@ -52,12 +52,13 @@ export function SidebarContent() {
       <SidebarGroup className="mt-4">
         <SidebarGroupContent>
           <div className="relative">
-            <Search className="absolute left-2 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+
             <SidebarInput
-              placeholder="Search by title..."
+              placeholder="Search notes..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8"
+              className="pl-9"
             />
           </div>
         </SidebarGroupContent>
@@ -65,6 +66,7 @@ export function SidebarContent() {
 
       <SidebarGroup>
         <SidebarGroupLabel>Folders</SidebarGroupLabel>
+
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -98,7 +100,7 @@ export function SidebarContent() {
         <SidebarGroupContent>
           <SidebarMenu>
             {filteredNotes.length === 0 ? (
-              <div className="px-2 py-4 text-center text-sm text-muted-foreground">
+              <div className="px-3 py-6 text-center text-sm text-muted-foreground">
                 {searchQuery || selectedFolder
                   ? "No notes found"
                   : "No notes yet"}
@@ -110,9 +112,10 @@ export function SidebarContent() {
                     asChild
                     isActive={currentNoteId === note.id}
                     tooltip={note.title}
+                    className="transition-all"
                   >
                     <Link to="/n/$id" params={{ id: note.id }}>
-                      <span className="truncate">{note.title}</span>
+                      <span className="truncate font-normal">{note.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
