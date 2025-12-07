@@ -1,1 +1,1 @@
-export type ViewMode = "edit" | "split" | "preview";
+export type ViewMode = "edit" | "split" | "read-only";

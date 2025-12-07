@@ -10,11 +10,21 @@ interface ToolbarButtonConfig {
 interface ToolbarButtonsProps {
   buttons: ToolbarButtonConfig[];
   handlers: Record<string, () => void>;
+  disabled?: boolean;
 }
 
-export function ToolbarButtons({ buttons, handlers }: ToolbarButtonsProps) {
+export function ToolbarButtons({
+  buttons,
+  handlers,
+  disabled,
+}: ToolbarButtonsProps) {
   return (
-    <ButtonGroup aria-label="Toolbar buttons">
+    <ButtonGroup
+      aria-label={
+        disabled ? "Cannot edit in read-only mode" : "Toolbar buttons"
+      }
+      title={disabled ? "Cannot edit in read-only mode" : undefined}
+    >
       {buttons.map((button) => {
         const Icon = button.icon;
         return (
@@ -25,6 +35,7 @@ export function ToolbarButtons({ buttons, handlers }: ToolbarButtonsProps) {
             onClick={handlers[button.label]}
             title={button.label}
             className="h-8 w-8"
+            disabled={disabled}
           >
             <Icon className="size-4" />
           </Button>

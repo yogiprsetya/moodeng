@@ -22,7 +22,11 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
     <div className="flex flex-col border border-border rounded-xl bg-card overflow-hidden">
       {/* Toolbar */}
       <div className="flex items-center justify-between border-b border-border/50 bg-muted/30 px-4 py-2">
-        <ToolbarButtons buttons={toolbarButtons} handlers={handlers} />
+        <ToolbarButtons
+          buttons={toolbarButtons}
+          handlers={handlers}
+          disabled={viewMode === "read-only"}
+        />
         <ViewToggle viewMode={viewMode} setViewMode={setViewMode} />
       </div>
 
@@ -46,7 +50,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
           </div>
         )}
 
-        {(viewMode === "preview" || viewMode === "split") && (
+        {(viewMode === "read-only" || viewMode === "split") && (
           <div
             className={cn(
               "flex-1 overflow-auto",
