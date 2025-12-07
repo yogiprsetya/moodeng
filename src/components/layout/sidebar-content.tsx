@@ -114,7 +114,7 @@ export function SidebarContent() {
                     tooltip={note.title}
                   >
                     <Link to="/n/$id" params={{ id: note.id }}>
-                      <span className="truncate font-normal">{note.title}</span>
+                      <span className="truncate">{note.title}</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

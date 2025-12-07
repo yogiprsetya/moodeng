@@ -5,3 +5,4 @@
 - Dark mode support
 - Inpired by Trello
 - Satisfying UI style
+- Whitespace enough
