@@ -44,8 +44,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
               value={value}
               onChange={(e) => onChange(e.target.value)}
               placeholder="Start writing ..."
-              className="flex-1 w-full p-6 resize-none outline-none bg-background text-foreground leading-relaxed"
-              style={{ minHeight: "550px" }}
+              className="flex-1 w-full p-6 min-h-[550px] resize-none outline-none bg-background text-foreground leading-relaxed"
             />
           </div>
         )}
@@ -59,7 +58,10 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
           >
             <div className="p-6 prose max-w-none">
               {value.trim() ? (
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown
+                  remarkPlugins={[remarkGfm]}
+                  className="min-h-[550px]"
+                >
                   {value}
                 </ReactMarkdown>
               ) : (
