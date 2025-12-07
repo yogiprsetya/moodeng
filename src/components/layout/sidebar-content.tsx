@@ -1,5 +1,5 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { Search, Folder } from "lucide-react";
+import { Search, Folder, NotebookText } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   SidebarContent as SidebarContentWrapper,
@@ -8,6 +8,7 @@ import {
   SidebarGroupLabel,
   SidebarInput,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
@@ -117,6 +118,16 @@ export function SidebarContent() {
                       <span className="truncate">{note.title}</span>
                     </Link>
                   </SidebarMenuButton>
+                  <SidebarMenuAction
+                    showOnHover
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      // TODO: Implement read-only toggle functionality
+                    }}
+                    title="read-only view"
+                  >
+                    <NotebookText />
+                  </SidebarMenuAction>
                 </SidebarMenuItem>
               ))
             )}
