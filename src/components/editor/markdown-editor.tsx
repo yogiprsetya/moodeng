@@ -1,11 +1,11 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "~/utils/css";
-import type { ViewMode } from "~/types/editor";
 import { ViewToggle } from "./view-toggle";
 import { ToolbarButtons } from "./toolbar-button";
 import { useToolbar } from "./use-toolbar";
+import { useEditorStore } from "~/store/editor-store";
 
 interface MarkdownEditorProps {
   value: string;
@@ -13,7 +13,7 @@ interface MarkdownEditorProps {
 }
 
 export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
-  const [viewMode, setViewMode] = useState<ViewMode>("edit");
+  const { viewMode, setViewMode } = useEditorStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const { toolbarButtons, handlers } = useToolbar(value, onChange, textareaRef);
