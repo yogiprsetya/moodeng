@@ -21,8 +21,8 @@
 
 ### Topbar
 
-- Left: button sync and sync alert
-- Toolbar
+- Right: button sync and sync alert
+- Left: Workspace title | toolbar (new notes)
 
 ## UI Interaction
 

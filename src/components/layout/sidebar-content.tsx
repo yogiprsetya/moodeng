@@ -1,5 +1,5 @@
 import { Link, useParams } from "@tanstack/react-router";
-import { Search, Folder, NotebookText } from "lucide-react";
+import { Search, Folder, NotebookText, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
 import {
   SidebarContent as SidebarContentWrapper,
@@ -12,6 +12,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { Button } from "~/components/ui/button";
+import { useNotes } from "~/hooks/use-notes";
 
 export function SidebarContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,19 +23,11 @@ export function SidebarContent() {
   const params = useParams({ strict: false });
   const currentNoteId = params?.id;
 
-  // TODO: Replace with actual notes data from store/API
-  const notes = useMemo(() => {
-    // Mock data for now
-    return [
-      { id: "1", title: "Welcome Note", folder: null },
-      { id: "2", title: "Meeting Notes", folder: "work" },
-      { id: "3", title: "Personal Thoughts", folder: "personal" },
-    ];
-  }, []);
+  const { notes, isLoading, handleCreateNewNote } = useNotes();
 
   const folders = useMemo(() => {
     const uniqueFolders = Array.from(
-      new Set(notes.map((note) => note.folder).filter(Boolean))
+      new Set(notes.map((note) => note.folderId).filter(Boolean))
     );
     return uniqueFolders as string[];
   }, [notes]);
@@ -43,7 +37,7 @@ export function SidebarContent() {
       const matchesSearch =
         !searchQuery ||
         note.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesFolder = !selectedFolder || note.folder === selectedFolder;
+      const matchesFolder = !selectedFolder || note.folderId === selectedFolder;
       return matchesSearch && matchesFolder;
     });
   }, [notes, searchQuery, selectedFolder]);
@@ -100,11 +94,20 @@ export function SidebarContent() {
 
         <SidebarGroupContent>
           <SidebarMenu>
-            {filteredNotes.length === 0 ? (
+            {isLoading ? (
               <div className="px-3 py-6 text-center text-muted-foreground">
-                {searchQuery || selectedFolder
-                  ? "No notes found"
-                  : "No notes yet"}
+                Loading notes...
+              </div>
+            ) : filteredNotes.length === 0 ? (
+              <div className="px-3 py-6 text-center">
+                <Button
+                  onClick={() => handleCreateNewNote(selectedFolder)}
+                  variant="outline"
+                  className="w-full"
+                >
+                  <Plus className="size-4" />
+                  New Note
+                </Button>
               </div>
             ) : (
               filteredNotes.map((note) => (
