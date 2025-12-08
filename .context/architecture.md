@@ -50,3 +50,7 @@
 - src/routes -> pages
 - src/components/ui -> atomic component (e.g, button, input)
 - src/components/layout -> layout level UI (e.g, navbar)
+- src/adapters -> a bridge between two incompatible interfaces
+- src/services/browser -> local fisrt storage
+- src/services/firebase -> firebase query declaration
+- .docs/ -> technical documentation

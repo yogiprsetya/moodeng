@@ -26,7 +26,10 @@
 
     "baseUrl": ".",
     "paths": {
-      "~/*": ["./src/*"]
+      "~/*": ["./src/*"],
+      "@browser/*": ["./src/services/browser/*"],
+      "@firebase/*": ["./src/services/firebase/*"],
+      "@adapters/*": ["./src/adapters/*"]
     }
   },
   "include": ["src"]

@@ -5,7 +5,7 @@ import { cn } from "~/utils/css";
 import { ViewToggle } from "./view-toggle";
 import { ToolbarButtons } from "./toolbar-button";
 import { useToolbar } from "./use-toolbar";
-import { useEditorStore } from "~/store/editor-store";
+import { useEditorStore } from "~/stores/editor-store";
 
 interface MarkdownEditorProps {
   value: string;

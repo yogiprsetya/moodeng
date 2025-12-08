@@ -1,5 +1,5 @@
 import { Palette, Moon, Sun, Monitor, type LucideIcon } from "lucide-react";
-import { useThemeStore } from "~/store/theme-store";
+import { useThemeStore } from "~/stores/theme-store";
 import { type ThemeName, type ColorScheme } from "~/types/theme";
 import { Button } from "~/components/ui/button";
 import {

@@ -1,6 +1,6 @@
 import { MarkdownEditor } from "./markdown-editor";
 import { TitleEditor } from "./title-editor";
-import { useEditorStore } from "~/store/editor-store";
+import { useEditorStore } from "~/stores/editor-store";
 
 export const Editor = () => {
   const { title, content, setTitle, setContent } = useEditorStore();

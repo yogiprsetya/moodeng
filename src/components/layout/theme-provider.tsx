@@ -1,5 +1,5 @@
 import { useEffect, type ReactNode } from "react";
-import { useThemeStore } from "~/store/theme-store";
+import { useThemeStore } from "~/stores/theme-store";
 
 // Provider component to initialize theme and listen to system changes
 export function ThemeProvider({ children }: { children: ReactNode }) {
