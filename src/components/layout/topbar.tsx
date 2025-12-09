@@ -10,7 +10,7 @@ import {
   NavigationMenuTrigger,
 } from "~/components/ui/navigation-menu";
 import { cn } from "~/utils/css";
-import { useNotes } from "~/hooks/use-notes";
+import { useNotes } from "~/services/use-notes";
 import { ThemeSetting } from "./theme-setting";
 
 type SyncStatus = "synced" | "syncing" | "error" | "offline";

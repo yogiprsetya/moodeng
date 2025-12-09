@@ -1,4 +1,4 @@
-import { db } from "~/services/browser/db";
+import { db } from "~/api/browser/db";
 import { useCallback, useEffect, useState } from "react";
 import type { Note } from "~/types/note";
 import { useNavigate } from "@tanstack/react-router";
@@ -59,9 +59,20 @@ export const useNotes = () => {
     [navigate]
   );
 
+  const handleDeleteNote = useCallback(async (noteId: string) => {
+    try {
+      await db.deleteNote(noteId);
+      setNotes((prev) => prev.filter((note) => note.id !== noteId));
+    } catch (err) {
+      console.error("Error deleting note:", err);
+      // setError(err instanceof Error ? err : new Error("Failed to delete note"));
+    }
+  }, []);
+
   return {
     isLoading,
     notes,
     handleCreateNewNote,
+    handleDeleteNote,
   };
 };
