@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "tw-animate-css";
+/* @import "tw-animate-css"; */
 
 @custom-variant dark (&:is(.dark *));
 
@@ -114,8 +114,18 @@
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+
+    /* Smooth transitions for theme changes - Miro-style */
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 550ms;
+  }
+
   body {
     font-family: "Noto Sans", sans-serif;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    @apply bg-background text-foreground transition-colors duration-200;
   }
 
   button:not(:disabled),
@@ -124,22 +134,7 @@
   }
 }
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground transition-colors duration-200;
-    font-feature-settings: "rlig" 1, "calt" 1;
-  }
-  
-  /* Smooth transitions for theme changes - Miro-style */
-  * {
-    transition-property: background-color, border-color, color, fill, stroke, box-shadow, transform;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 150ms;
-  }
-  
+@layer base {  
   /* Miro-inspired theme adjustments */
   [data-theme="warm"] {
     --background: oklch(0.99 0.008 40);

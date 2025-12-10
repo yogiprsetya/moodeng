@@ -1,12 +1,5 @@
 import { Link, useParams, useNavigate } from "@tanstack/react-router";
-import {
-  Search,
-  Folder,
-  NotebookText,
-  Plus,
-  Trash2,
-  MoreHorizontal,
-} from "lucide-react";
+import { Search, Folder, Plus, MoreHorizontal } from "lucide-react";
 import { useMemo, useState, lazy, Suspense } from "react";
 import {
   SidebarContent as SidebarContentWrapper,
@@ -148,6 +141,7 @@ export function SidebarContent() {
                   onClick={() => handleCreateNewNote(selectedFolder)}
                   variant="outline"
                   className="w-full"
+                  size="sm"
                 >
                   <Plus className="size-4" />
                   New Note
@@ -174,17 +168,13 @@ export function SidebarContent() {
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent side="right" align="start">
-                      <DropdownMenuItem>
-                        <NotebookText />
-                        <span>Read-only view</span>
-                      </DropdownMenuItem>
+                      <DropdownMenuItem>Read-only view</DropdownMenuItem>
 
                       <DropdownMenuItem
                         onClick={() => setDeleteNoteId(note.id)}
                         variant="destructive"
                       >
-                        <Trash2 />
-                        <span>Delete Notes</span>
+                        Delete Notes
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

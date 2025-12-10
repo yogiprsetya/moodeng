@@ -38,7 +38,7 @@ export function DeleteNoteDialog({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
 
-          <AlertDialogAction onClick={onConfirmDelete}>
+          <AlertDialogAction onClick={onConfirmDelete} variant="destructive">
             Delete
           </AlertDialogAction>
         </AlertDialogFooter>

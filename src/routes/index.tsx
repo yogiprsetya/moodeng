@@ -10,6 +10,7 @@ function HomePage() {
       <h1 className="text-5xl font-semibold mb-6 text-foreground tracking-tight">
         Welcome to Moodeng
       </h1>
+
       <p className="text-lg text-muted-foreground max-w-md leading-relaxed">
         A beautiful note-taking app inspired by Miro. Start creating your notes
         today.
