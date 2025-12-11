@@ -14,6 +14,7 @@ import {
 } from "~/components/ui/sidebar";
 import { Button } from "~/components/ui/button";
 import { useNotes } from "~/services/use-notes";
+import { useFetchCollections } from "~/services/use-fetch-collections";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,12 +48,11 @@ export function SidebarContent() {
   const { notes, isLoading, handleCreateNewNote, handleDeleteNote, refetch } =
     useNotes();
 
-  const folders = useMemo(() => {
-    const uniqueFolders = Array.from(
-      new Set(notes.map((note) => note.folderId).filter(Boolean))
-    );
-    return uniqueFolders as string[];
-  }, [notes]);
+  const {
+    collections,
+    isLoading: isLoadingCollections,
+    refetch: refetchCollections,
+  } = useFetchCollections();
 
   const filteredNotes = useMemo(() => {
     return notes.filter((note) => {
@@ -119,27 +119,33 @@ export function SidebarContent() {
 
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton
-                onClick={() => setSelectedFolder(null)}
-                isActive={selectedFolder === null}
-              >
-                <Folder className="size-4" />
-                <span>All Notes</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-
-            {folders.map((folder) => (
-              <SidebarMenuItem key={folder}>
-                <SidebarMenuButton
-                  onClick={() => setSelectedFolder(folder)}
-                  isActive={selectedFolder === folder}
-                >
-                  <Folder className="size-4" />
-                  <span>{folder}</span>
-                </SidebarMenuButton>
+            {isLoadingCollections ? (
+              <SidebarMenuItem>
+                <div className="px-3 py-2 text-sm text-muted-foreground">
+                  Loading folders...
+                </div>
               </SidebarMenuItem>
-            ))}
+            ) : (
+              collections.map((collection) => (
+                <SidebarMenuItem key={collection.id}>
+                  <SidebarMenuButton
+                    onClick={() => setSelectedFolder(collection.id)}
+                    isActive={selectedFolder === collection.id}
+                  >
+                    <Folder className="size-4" />
+                    <span>{collection.name}</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))
+            )}
+
+            {collections.length === 0 && (
+              <SidebarMenuItem>
+                <div className="px-3 py-2 text-sm text-muted-foreground">
+                  No folders found
+                </div>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>
@@ -215,7 +221,8 @@ export function SidebarContent() {
           open={isAddFolderOpen}
           onOpenChange={setIsAddFolderOpen}
           onFolderCreated={() => {
-            // Refresh notes to update the folders list
+            // Refresh collections and notes
+            refetchCollections();
             refetch();
           }}
         />
