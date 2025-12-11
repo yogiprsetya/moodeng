@@ -27,17 +27,24 @@ const DeleteNoteDialog = lazy(() =>
   }))
 );
 
+const AddFolderDialog = lazy(() =>
+  import("../common/add-folder").then((m) => ({
+    default: m.AddFolderDialog,
+  }))
+);
+
 export function SidebarContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [deleteNoteId, setDeleteNoteId] = useState<string | null>(null);
+  const [isAddFolderOpen, setIsAddFolderOpen] = useState(false);
   const navigate = useNavigate();
 
   // Get current note ID from route params if on note page
   const params = useParams({ strict: false });
   const currentNoteId = params?.id;
 
-  const { notes, isLoading, handleCreateNewNote, handleDeleteNote } =
+  const { notes, isLoading, handleCreateNewNote, handleDeleteNote, refetch } =
     useNotes();
 
   const folders = useMemo(() => {
@@ -97,7 +104,18 @@ export function SidebarContent() {
       </SidebarGroup>
 
       <SidebarGroup>
-        <SidebarGroupLabel>Folders</SidebarGroupLabel>
+        <SidebarGroupLabel className="justify-between">
+          <span>Folders</span>
+
+          <Button
+            size="icon"
+            variant="ghost"
+            title="Create new folder"
+            onClick={() => setIsAddFolderOpen(true)}
+          >
+            <Plus />
+          </Button>
+        </SidebarGroupLabel>
 
         <SidebarGroupContent>
           <SidebarMenu>
@@ -191,6 +209,15 @@ export function SidebarContent() {
           onOpenChange={(open) => !open && setDeleteNoteId(null)}
           onConfirmDelete={handleConfirmDelete}
           noteTitle={noteToDelete?.title}
+        />
+
+        <AddFolderDialog
+          open={isAddFolderOpen}
+          onOpenChange={setIsAddFolderOpen}
+          onFolderCreated={() => {
+            // Refresh notes to update the folders list
+            refetch();
+          }}
         />
       </Suspense>
     </SidebarContentWrapper>

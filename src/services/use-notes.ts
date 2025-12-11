@@ -67,5 +67,6 @@ export const useNotes = () => {
     notes,
     handleCreateNewNote,
     handleDeleteNote,
+    refetch: fetchNotes,
   };
 };
