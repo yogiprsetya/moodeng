@@ -8,6 +8,7 @@ Personal user setting
   "theme": string,
   "darkmode": boolean,
   "title": string
+  "lastNoteId": null | uuid
 }
 ```
 

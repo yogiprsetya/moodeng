@@ -12,11 +12,26 @@ export class WorkspaceRepository {
   }
 
   /**
-   * Get workspace settings
+   * Create default workspace
+   */
+  private createDefaultWorkspace(): Workspace {
+    return {
+      clientId: crypto.randomUUID(),
+      theme: "default",
+      darkmode: false,
+      title: "My Workspace",
+      lastNoteId: null,
+    };
+  }
+
+  /**
+   * Get workspace settings, create default if not exists
    */
   async get(): Promise<Workspace | null> {
     const db = await this.database.getDB();
-    return new Promise((resolve, reject) => {
+    
+    // First, try to get existing workspace
+    const workspace = await new Promise<Workspace | null>((resolve, reject) => {
       const transaction = db.transaction([STORES.WORKSPACE], "readonly");
       const store = transaction.objectStore(STORES.WORKSPACE);
       const request = store.get("workspace");
@@ -29,6 +44,15 @@ export class WorkspaceRepository {
         reject(new Error("Failed to get workspace"));
       };
     });
+
+    // Create default workspace if it doesn't exist
+    if (!workspace) {
+      const defaultWorkspace = this.createDefaultWorkspace();
+      await this.save(defaultWorkspace);
+      return defaultWorkspace;
+    }
+
+    return workspace;
   }
 
   /**

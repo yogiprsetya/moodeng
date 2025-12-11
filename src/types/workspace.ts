@@ -5,4 +5,5 @@ export interface Workspace {
   theme: ThemeName;
   darkmode: boolean;
   title: string;
+  lastNoteId: string | null;
 }
