@@ -1,29 +1,14 @@
 import { db } from "~/api/browser/db";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 import type { Note } from "~/types/note";
 import { useNavigate } from "@tanstack/react-router";
+import { useFetchNotes } from "./use-fetch-notes";
 
 export const useNotes = () => {
-  const [isLoading, setIsLoading] = useState(true);
-  const [notes, setNotes] = useState<Note[]>([]);
+  const { notes, isLoading, refetch: fetchNotes } = useFetchNotes();
   const navigate = useNavigate();
 
-  // Fetch notes from database
-  const fetchNotes = async () => {
-    try {
-      setIsLoading(true);
-      const allNotes = await db.getAllNotes();
-      setNotes(allNotes);
-    } catch (err) {
-      console.error("Error fetching notes:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchNotes();
-
     // Listen for note updates and refresh the list
     const handleNoteUpdated = () => {
       fetchNotes();
@@ -34,7 +19,7 @@ export const useNotes = () => {
     return () => {
       window.removeEventListener("note-updated", handleNoteUpdated);
     };
-  }, []);
+  }, [fetchNotes]);
 
   const handleCreateNewNote = useCallback(
     async (selectedFolder?: string | null) => {
@@ -56,23 +41,26 @@ export const useNotes = () => {
         };
 
         await db.createNote(newNote);
-        setNotes((prev) => [...prev, newNote]);
+        fetchNotes(); // Refresh the notes list
         navigate({ to: "/n/$id", params: { id: newNote.id } });
       } catch (err) {
         console.error("Error creating note:", err);
       }
     },
-    [navigate]
+    [navigate, fetchNotes]
   );
 
-  const handleDeleteNote = useCallback(async (noteId: string) => {
-    try {
-      await db.deleteNote(noteId);
-      setNotes((prev) => prev.filter((note) => note.id !== noteId));
-    } catch (err) {
-      console.error("Error deleting note:", err);
-    }
-  }, []);
+  const handleDeleteNote = useCallback(
+    async (noteId: string) => {
+      try {
+        await db.deleteNote(noteId);
+        fetchNotes(); // Refresh the notes list
+      } catch (err) {
+        console.error("Error deleting note:", err);
+      }
+    },
+    [fetchNotes]
+  );
 
   return {
     isLoading,

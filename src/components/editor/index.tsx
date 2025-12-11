@@ -3,12 +3,12 @@ import { TitleEditor } from "./title-editor";
 import { useEditorContent } from "~/services/use-editor-content";
 
 export const Editor = () => {
-  const { title, content, updateTitle, updateContent } = useEditorContent();
+  const { content, updateTitle, updateContent } = useEditorContent();
 
   return (
     <div className="flex flex-col gap-6">
-      <TitleEditor value={title} onChange={updateTitle} />
-      <MarkdownEditor value={content} onChange={updateContent} />
+      <TitleEditor value={content?.title ?? ""} onChange={updateTitle} />
+      <MarkdownEditor value={content?.content ?? ""} onChange={updateContent} />
     </div>
   );
 };

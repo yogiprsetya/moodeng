@@ -18,7 +18,6 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [localValue, setLocalValue] = useState(value);
 
-  // Debounced onChange callback - triggers after 2 seconds of inactivity
   const debouncedOnChange = useDebouncedCallback(onChange, 2000);
 
   // Sync local value when prop changes externally (e.g., when note is loaded)
@@ -64,6 +63,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
             <textarea
               ref={textareaRef}
               value={localValue}
+              onBlur={(e) => onChange(e.target.value)}
               onChange={(e) => handleChange(e.target.value)}
               placeholder="Start writing ..."
               className="flex-1 w-full p-6 min-h-[550px] resize-none outline-none bg-background text-foreground leading-relaxed"
