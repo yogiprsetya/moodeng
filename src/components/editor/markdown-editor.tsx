@@ -1,4 +1,5 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { cn } from "~/utils/css";
@@ -15,8 +16,29 @@ interface MarkdownEditorProps {
 export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
   const { viewMode, setViewMode } = useEditorStore();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [localValue, setLocalValue] = useState(value);
 
-  const { toolbarButtons, handlers } = useToolbar(value, onChange, textareaRef);
+  // Debounced onChange callback - triggers after 2 seconds of inactivity
+  const debouncedOnChange = useDebouncedCallback(onChange, 2000);
+
+  // Sync local value when prop changes externally (e.g., when note is loaded)
+  useEffect(() => {
+    if (value !== localValue) {
+      setLocalValue(value);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value]);
+
+  const handleChange = (newValue: string) => {
+    setLocalValue(newValue);
+    debouncedOnChange(newValue);
+  };
+
+  const { toolbarButtons, handlers } = useToolbar(
+    localValue,
+    handleChange,
+    textareaRef
+  );
 
   return (
     <div className="flex flex-col border border-border rounded-xl bg-card overflow-hidden">
@@ -41,8 +63,8 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
           >
             <textarea
               ref={textareaRef}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
+              value={localValue}
+              onChange={(e) => handleChange(e.target.value)}
               placeholder="Start writing ..."
               className="flex-1 w-full p-6 min-h-[550px] resize-none outline-none bg-background text-foreground leading-relaxed"
             />
@@ -57,12 +79,12 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
             )}
           >
             <div className="p-6 prose max-w-none">
-              {value.trim() ? (
+              {localValue.trim() ? (
                 <ReactMarkdown
                   remarkPlugins={[remarkGfm]}
                   className="min-h-[550px]"
                 >
-                  {value}
+                  {localValue}
                 </ReactMarkdown>
               ) : (
                 <p className="text-muted-foreground italic">

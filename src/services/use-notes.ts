@@ -9,24 +9,31 @@ export const useNotes = () => {
   const navigate = useNavigate();
 
   // Fetch notes from database
-  useEffect(() => {
-    async function fetchNotes() {
-      try {
-        setIsLoading(true);
-        // setError(null);
-        const allNotes = await db.getAllNotes();
-        setNotes(allNotes);
-      } catch (err) {
-        // setError(
-        //   err instanceof Error ? err : new Error("Failed to load notes")
-        // );
-        console.error("Error fetching notes:", err);
-      } finally {
-        setIsLoading(false);
-      }
+  const fetchNotes = async () => {
+    try {
+      setIsLoading(true);
+      const allNotes = await db.getAllNotes();
+      setNotes(allNotes);
+    } catch (err) {
+      console.error("Error fetching notes:", err);
+    } finally {
+      setIsLoading(false);
     }
+  };
 
+  useEffect(() => {
     fetchNotes();
+
+    // Listen for note updates and refresh the list
+    const handleNoteUpdated = () => {
+      fetchNotes();
+    };
+
+    window.addEventListener("note-updated", handleNoteUpdated);
+
+    return () => {
+      window.removeEventListener("note-updated", handleNoteUpdated);
+    };
   }, []);
 
   const handleCreateNewNote = useCallback(
@@ -53,7 +60,6 @@ export const useNotes = () => {
         navigate({ to: "/n/$id", params: { id: newNote.id } });
       } catch (err) {
         console.error("Error creating note:", err);
-        // setError(err instanceof Error ? err : new Error("Failed to create note"));
       }
     },
     [navigate]
@@ -65,7 +71,6 @@ export const useNotes = () => {
       setNotes((prev) => prev.filter((note) => note.id !== noteId));
     } catch (err) {
       console.error("Error deleting note:", err);
-      // setError(err instanceof Error ? err : new Error("Failed to delete note"));
     }
   }, []);
 

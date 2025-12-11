@@ -6,8 +6,5 @@ export const Route = createFileRoute("/n/$id")({
 });
 
 function NotePage() {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { id: _id } = Route.useParams();
-
   return <Editor />;
 }

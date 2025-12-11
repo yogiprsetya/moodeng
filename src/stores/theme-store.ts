@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { themes } from "~/constants/themes";
-import { type ColorScheme, type ThemeName } from "~/types/theme";
+import type { ColorScheme, ThemeName } from "~/types/theme";
 
 const STORAGE_KEY = "moodeng-theme";
 

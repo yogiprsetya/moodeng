@@ -31,6 +31,7 @@
     "remark-gfm": "^4.0.0",
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",
+    "use-debounce": "^10.0.6",
     "zustand": "^5.0.9"
   },
   "devDependencies": {
