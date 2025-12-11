@@ -1,5 +1,6 @@
 import { useParams } from "@tanstack/react-router";
 import { useCallback } from "react";
+import { toast } from "sonner";
 import { db } from "~/api/browser/db";
 import { useFetchNoteById } from "./use-fetch-note-by-id";
 
@@ -23,7 +24,12 @@ export const useEditorContent = () => {
             new CustomEvent("note-updated", { detail: { noteId } })
           );
         } catch (err) {
-          console.error("Error updating note title:", err);
+          toast.error("Failed to update note title", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "An unexpected error occurred",
+          });
         }
       }
     },
@@ -40,7 +46,12 @@ export const useEditorContent = () => {
             updatedAt: Date.now(),
           });
         } catch (err) {
-          console.error("Error updating note content:", err);
+          toast.error("Failed to update note content", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "An unexpected error occurred",
+          });
         }
       }
     },
