@@ -12,7 +12,6 @@ function NotePage() {
   const { workspace, updateLastNoteId } = useWorkspace();
 
   useEffect(() => {
-    console.log("workspace", workspace);
     if (workspace) {
       // Update lastNoteId if it's different (handle backward compatibility)
       const currentLastNoteId = workspace.lastNoteId ?? null;

@@ -3,10 +3,13 @@ import { useCallback } from "react";
 import { toast } from "sonner";
 import { db } from "~/api/browser/db";
 import { useFetchNoteById } from "./use-fetch-note-by-id";
+import { useEditorStore } from "~/stores/editor-store";
 
 export const useEditorContent = () => {
   const { id: noteId } = useParams({ strict: false });
+
   const { note } = useFetchNoteById({ noteId });
+  const { setSyncStatus } = useEditorStore();
 
   const updateTitle = useCallback(
     async (newTitle: string) => {
@@ -38,6 +41,7 @@ export const useEditorContent = () => {
 
   const updateContent = useCallback(
     async (newContent: string) => {
+      setSyncStatus("saving");
       // Save to database if we have a note ID
       if (noteId) {
         try {
@@ -52,10 +56,12 @@ export const useEditorContent = () => {
                 ? err.message
                 : "An unexpected error occurred",
           });
+        } finally {
+          setTimeout(() => setSyncStatus("saved"), 1000);
         }
       }
     },
-    [noteId]
+    [noteId, setSyncStatus]
   );
 
   return {

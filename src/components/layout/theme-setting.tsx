@@ -32,7 +32,7 @@ export function ThemeSetting() {
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button variant="ghost" size="icon" className="relative">
+        <Button variant="ghost" size="icon">
           <Palette className="size-4" />
           <span className="sr-only">Theme Settings</span>
         </Button>

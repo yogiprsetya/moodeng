@@ -1,6 +1,4 @@
-import { Cloud, CloudOff, AlertCircle } from "lucide-react";
-import { useState } from "react";
-import { Button } from "~/components/ui/button";
+import { Cloud, CloudCheck } from "lucide-react";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -9,14 +7,13 @@ import {
   NavigationMenuList,
   NavigationMenuTrigger,
 } from "~/components/ui/navigation-menu";
-import { cn } from "~/utils/css";
 import { useNotes } from "~/services/use-notes";
 import { ThemeSetting } from "./theme-setting";
-
-type SyncStatus = "synced" | "syncing" | "error" | "offline";
+import { useEditorStore } from "~/stores/editor-store";
+import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 
 export function Topbar() {
-  const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
+  const { syncStatus } = useEditorStore();
   const { handleCreateNewNote } = useNotes();
 
   return (
@@ -52,46 +49,21 @@ export function Topbar() {
 
           {/* Right: Sync button and sync alert */}
           <div className="flex items-center gap-2">
-            <ThemeSetting />
-
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-8 w-8 rounded-lg"
-              onClick={() => {
-                // TODO: Implement sync logic
-                setSyncStatus("syncing");
-                setTimeout(() => setSyncStatus("synced"), 2000);
-              }}
-              disabled={syncStatus === "syncing"}
-            >
-              {syncStatus === "syncing" ? (
-                <Cloud className="size-4 animate-pulse" />
-              ) : syncStatus === "offline" ? (
-                <CloudOff className="size-4" />
-              ) : (
-                <Cloud className="size-4" />
-              )}
-              <span className="sr-only">Sync</span>
-            </Button>
-
-            {syncStatus === "error" && (
-              <div
-                className={cn(
-                  "flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs",
-                  "bg-destructive/10 text-destructive border border-destructive/20 shadow-sm"
+            <Tooltip open={syncStatus === "saving"}>
+              <TooltipTrigger disabled asChild>
+                {syncStatus === "saving" ? (
+                  <Cloud className="size-4.5 animate-pulse" />
+                ) : (
+                  <CloudCheck className="size-4" />
                 )}
-              >
-                <AlertCircle className="size-3" />
-                <span>Sync failed</span>
-              </div>
-            )}
+              </TooltipTrigger>
 
-            {syncStatus === "syncing" && (
-              <div className="flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs text-muted-foreground">
-                <span>Syncing...</span>
-              </div>
-            )}
+              <TooltipContent align="center" side="right">
+                Saving...
+              </TooltipContent>
+            </Tooltip>
+
+            <ThemeSetting />
           </div>
         </div>
       </div>
