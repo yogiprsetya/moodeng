@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
 import { Button } from "~/components/ui/button";
+import { ScrollArea } from "~/components/ui/scroll-area";
 import { useNotes } from "~/services/use-notes";
 import { useFetchCollections } from "~/services/use-fetch-collections";
 import {
@@ -173,119 +174,123 @@ export function SidebarContent() {
           </Button>
         </SidebarGroupLabel>
 
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {isLoadingCollections ? (
-              <SidebarMenuItem>
-                <div className="px-3 py-2 text-sm text-muted-foreground">
-                  Loading folders...
-                </div>
-              </SidebarMenuItem>
-            ) : (
-              collections.map((collection) => (
-                <SidebarMenuItem key={collection.id}>
-                  <SidebarMenuButton
-                    onClick={() => setSelectedFolder(collection.id)}
-                    isActive={selectedFolder === collection.id}
-                  >
-                    <Folder className="size-4" />
-                    <span>{collection.name}</span>
-                  </SidebarMenuButton>
-
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuAction>
-                        <MoreHorizontal />
-                      </SidebarMenuAction>
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent side="right" align="start">
-                      <DropdownMenuItem
-                        onClick={() => handleCreateNewNote(collection.id)}
-                      >
-                        Add Notes to Collection
-                      </DropdownMenuItem>
-
-                      <DropdownMenuItem
-                        onClick={() => setDeleteCollectionId(collection.id)}
-                        variant="destructive"
-                      >
-                        Delete Collection
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+        <ScrollArea className="max-h-32">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {isLoadingCollections ? (
+                <SidebarMenuItem>
+                  <div className="px-3 py-2 text-sm text-muted-foreground">
+                    Loading folders...
+                  </div>
                 </SidebarMenuItem>
-              ))
-            )}
+              ) : (
+                collections.map((collection) => (
+                  <SidebarMenuItem key={collection.id}>
+                    <SidebarMenuButton
+                      onClick={() => setSelectedFolder(collection.id)}
+                      isActive={selectedFolder === collection.id}
+                    >
+                      <Folder className="size-4" />
+                      <span>{collection.name}</span>
+                    </SidebarMenuButton>
 
-            {collections.length === 0 && (
-              <SidebarMenuItem>
-                <div className="px-2 py-1 text-sm text-muted-foreground">
-                  No folders found
-                </div>
-              </SidebarMenuItem>
-            )}
-          </SidebarMenu>
-        </SidebarGroupContent>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuAction>
+                          <MoreHorizontal />
+                        </SidebarMenuAction>
+                      </DropdownMenuTrigger>
+
+                      <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem
+                          onClick={() => handleCreateNewNote(collection.id)}
+                        >
+                          Add Notes to Collection
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem
+                          onClick={() => setDeleteCollectionId(collection.id)}
+                          variant="destructive"
+                        >
+                          Delete Collection
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                ))
+              )}
+
+              {collections.length === 0 && (
+                <SidebarMenuItem>
+                  <div className="px-2 py-1 text-sm text-muted-foreground">
+                    No folders found
+                  </div>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </ScrollArea>
       </SidebarGroup>
 
       <SidebarGroup>
         <SidebarGroupLabel>Notes</SidebarGroupLabel>
 
-        <SidebarGroupContent>
-          <SidebarMenu>
-            {isLoading ? (
-              <div className="px-3 py-6 text-center text-muted-foreground">
-                Loading notes...
-              </div>
-            ) : filteredNotes.length === 0 ? (
-              <div className="px-3 py-6 text-center">
-                <Button
-                  onClick={() => handleCreateNewNote(selectedFolder)}
-                  variant="outline"
-                  className="w-full"
-                  size="sm"
-                >
-                  <Plus className="size-4" />
-                  New Note
-                </Button>
-              </div>
-            ) : (
-              filteredNotes.map((note) => (
-                <SidebarMenuItem key={note.id}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={currentNoteId === note.id}
-                    tooltip={note.title}
+        <ScrollArea className="max-h-96">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {isLoading ? (
+                <div className="px-3 py-6 text-center text-muted-foreground">
+                  Loading notes...
+                </div>
+              ) : filteredNotes.length === 0 ? (
+                <div className="px-3 py-6 text-center">
+                  <Button
+                    onClick={() => handleCreateNewNote(selectedFolder)}
+                    variant="outline"
+                    className="w-full"
+                    size="sm"
                   >
-                    <Link to="/n/$id" params={{ id: note.id }}>
-                      <span className="truncate">{note.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
+                    <Plus className="size-4" />
+                    New Note
+                  </Button>
+                </div>
+              ) : (
+                filteredNotes.map((note) => (
+                  <SidebarMenuItem key={note.id}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={currentNoteId === note.id}
+                      tooltip={note.title}
+                    >
+                      <Link to="/n/$id" params={{ id: note.id }}>
+                        <span className="truncate">{note.title}</span>
+                      </Link>
+                    </SidebarMenuButton>
 
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <SidebarMenuAction>
-                        <MoreHorizontal />
-                      </SidebarMenuAction>
-                    </DropdownMenuTrigger>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuAction>
+                          <MoreHorizontal />
+                        </SidebarMenuAction>
+                      </DropdownMenuTrigger>
 
-                    <DropdownMenuContent side="right" align="start">
-                      <DropdownMenuItem>Read-only view</DropdownMenuItem>
+                      <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem>Read-only view</DropdownMenuItem>
 
-                      <DropdownMenuItem
-                        onClick={() => setDeleteNoteId(note.id)}
-                        variant="destructive"
-                      >
-                        Delete Notes
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </SidebarMenuItem>
-              ))
-            )}
-          </SidebarMenu>
-        </SidebarGroupContent>
+                        <DropdownMenuItem
+                          onClick={() => setDeleteNoteId(note.id)}
+                          variant="destructive"
+                        >
+                          Delete Notes
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                ))
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </ScrollArea>
       </SidebarGroup>
 
       <Suspense fallback={null}>
