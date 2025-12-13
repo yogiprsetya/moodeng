@@ -12,11 +12,13 @@ import { useEditorStore } from "~/stores/editor-store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
+import { useWorkspace } from "~/services/use-workspace";
 
 export function Topbar() {
   const { syncStatus } = useEditorStore();
   const { handleCreateNewNote } = useNotes();
   const { toggleSidebar } = useSidebar();
+  const { workspace } = useWorkspace();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur-md supports-backdrop-filter:bg-background/80">
@@ -24,7 +26,13 @@ export function Topbar() {
         <div className="flex items-center justify-between w-full">
           {/* Left: Workspace title | toolbar (new notes) */}
           <div className="w-64 flex items-center justify-between">
-            <p></p>
+            <div className="flex items-center gap-1 pl-4">
+              <img src="/logo.svg" alt="Moodeng" className="size-5" />
+
+              <p className="text-xs font-semibold">
+                {workspace?.title || "Moodeng"}
+              </p>
+            </div>
 
             <Button size="icon" variant="ghost" onClick={toggleSidebar}>
               <SidebarIcon className="size-4" />
