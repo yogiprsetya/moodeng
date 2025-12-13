@@ -148,6 +148,23 @@ export class LocalDB {
   }
 
   /**
+   * Delete a collection and handle its notes using CASCADE or SET NULL strategy
+   * @param id Collection ID to delete
+   * @param cascadeDelete If true, CASCADE delete all notes. If false, SET NULL (move notes to root)
+   * @param hardDelete If true, hard delete the collection
+   */
+  async deleteCollectionWithNotes(
+    id: string,
+    cascadeDelete: boolean,
+    hardDelete = false
+  ): Promise<void> {
+    // First handle the notes (CASCADE or SET NULL)
+    await this.notes.handleNotesByFolder(id, cascadeDelete);
+    // Then delete the collection
+    await this.collections.delete(id, hardDelete);
+  }
+
+  /**
    * Restore a soft-deleted collection
    */
   async restoreCollection(id: string): Promise<Collection> {

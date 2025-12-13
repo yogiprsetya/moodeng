@@ -203,4 +203,29 @@ export class NotesRepository {
       };
     });
   }
+
+  /**
+   * Handle notes when a collection is deleted
+   * Supports two deletion strategies:
+   * - CASCADE: Delete all notes in the collection (cascadeDelete = true)
+   * - SET NULL: Move notes to root by setting folderId to null (cascadeDelete = false)
+   * @param folderId The folder ID to process notes for
+   * @param cascadeDelete If true, CASCADE delete all notes. If false, SET NULL (move to root)
+   */
+  async handleNotesByFolder(
+    folderId: string,
+    cascadeDelete: boolean
+  ): Promise<void> {
+    const notes = await this.getByFolder(folderId);
+
+    if (cascadeDelete) {
+      // CASCADE: Delete all notes in the collection
+      await Promise.all(notes.map((note) => this.delete(note.id)));
+    } else {
+      // SET NULL: Move notes to root by setting folderId to null
+      await Promise.all(
+        notes.map((note) => this.update(note.id, { folderId: null }))
+      );
+    }
+  }
 }

@@ -28,6 +28,12 @@ const DeleteNoteDialog = lazy(() =>
   }))
 );
 
+const DeleteCollectionDialog = lazy(() =>
+  import("../common/delete-collection-dialog").then((m) => ({
+    default: m.DeleteCollectionDialog,
+  }))
+);
+
 const AddFolderDialog = lazy(() =>
   import("../common/add-folder").then((m) => ({
     default: m.AddFolderDialog,
@@ -38,6 +44,9 @@ export function SidebarContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [deleteNoteId, setDeleteNoteId] = useState<string | null>(null);
+  const [deleteCollectionId, setDeleteCollectionId] = useState<string | null>(
+    null
+  );
   const [isAddFolderOpen, setIsAddFolderOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -68,6 +77,22 @@ export function SidebarContent() {
     return deleteNoteId ? notes.find((note) => note.id === deleteNoteId) : null;
   }, [notes, deleteNoteId]);
 
+  const collectionToDelete = useMemo(() => {
+    return deleteCollectionId
+      ? collections.find((c) => c.id === deleteCollectionId)
+      : null;
+  }, [collections, deleteCollectionId]);
+
+  const collectionNoteCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    collections.forEach((collection) => {
+      counts[collection.id] = notes.filter(
+        (note) => note.folderId === collection.id
+      ).length;
+    });
+    return counts;
+  }, [collections, notes]);
+
   const handleConfirmDelete = async () => {
     if (!deleteNoteId) return;
 
@@ -84,6 +109,37 @@ export function SidebarContent() {
     }
 
     setDeleteNoteId(null);
+  };
+
+  const handleConfirmDeleteCollection = async (cascadeDelete: boolean) => {
+    if (!deleteCollectionId) return;
+
+    const { db } = await import("~/api/browser/db");
+    await db.deleteCollectionWithNotes(deleteCollectionId, cascadeDelete);
+
+    // If we're viewing a note in this collection and cascade delete is true, navigate away
+    if (cascadeDelete && currentNoteId) {
+      const currentNote = notes.find((note) => note.id === currentNoteId);
+      if (currentNote?.folderId === deleteCollectionId) {
+        const remainingNotes = notes.filter(
+          (note) => note.folderId !== deleteCollectionId
+        );
+        if (remainingNotes.length > 0) {
+          navigate({ to: "/n/$id", params: { id: remainingNotes[0].id } });
+        } else {
+          navigate({ to: "/" });
+        }
+      }
+    }
+
+    // If the deleted collection was selected, clear selection
+    if (selectedFolder === deleteCollectionId) {
+      setSelectedFolder(null);
+    }
+
+    setDeleteCollectionId(null);
+    refetchCollections();
+    refetch();
   };
 
   return (
@@ -135,13 +191,30 @@ export function SidebarContent() {
                     <Folder className="size-4" />
                     <span>{collection.name}</span>
                   </SidebarMenuButton>
+
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction>
+                        <MoreHorizontal />
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent side="right" align="start">
+                      <DropdownMenuItem
+                        onClick={() => setDeleteCollectionId(collection.id)}
+                        variant="destructive"
+                      >
+                        Delete Collection
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </SidebarMenuItem>
               ))
             )}
 
             {collections.length === 0 && (
               <SidebarMenuItem>
-                <div className="px-3 py-2 text-sm text-muted-foreground">
+                <div className="px-2 py-1 text-sm text-muted-foreground">
                   No folders found
                 </div>
               </SidebarMenuItem>
@@ -215,6 +288,18 @@ export function SidebarContent() {
           onOpenChange={(open) => !open && setDeleteNoteId(null)}
           onConfirmDelete={handleConfirmDelete}
           noteTitle={noteToDelete?.title}
+        />
+
+        <DeleteCollectionDialog
+          open={deleteCollectionId !== null}
+          onOpenChange={(open) => !open && setDeleteCollectionId(null)}
+          onConfirmDelete={handleConfirmDeleteCollection}
+          collectionName={collectionToDelete?.name}
+          noteCount={
+            collectionToDelete
+              ? (collectionNoteCounts[collectionToDelete.id] ?? 0)
+              : 0
+          }
         />
 
         <AddFolderDialog
