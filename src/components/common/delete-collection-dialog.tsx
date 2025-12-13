@@ -59,7 +59,7 @@ export function DeleteCollectionDialog({
             </p>
 
             {noteCount > 0 && (
-              <div className="space-y-2 rounded-md border p-3">
+              <>
                 <div className="flex items-start space-x-2">
                   <Checkbox
                     id="cascade-delete"
@@ -72,23 +72,25 @@ export function DeleteCollectionDialog({
                     htmlFor="cascade-delete"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
                   >
-                    CASCADE: Delete all {noteCount} note
+                    Delete all {noteCount} note
                     {noteCount !== 1 ? "s" : ""} in this collection
                   </label>
                 </div>
-                {cascadeDelete ? (
-                  <p className="text-xs text-muted-foreground pl-6">
-                    <strong>CASCADE mode:</strong> All notes in this collection
-                    will be permanently deleted along with the collection.
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground pl-6">
-                    <strong>SET NULL mode:</strong> Notes will be moved to the
-                    root folder (folderId set to null). The notes themselves
-                    will not be deleted.
-                  </p>
-                )}
-              </div>
+
+                <div className="p-2 rounded-md border text-xs text-muted-foreground">
+                  {cascadeDelete ? (
+                    <p>
+                      All notes in this collection will be permanently deleted
+                      along with the collection.
+                    </p>
+                  ) : (
+                    <p>
+                      Notes will be moved to the root folder. The notes
+                      themselves will not be deleted.
+                    </p>
+                  )}
+                </div>
+              </>
             )}
           </AlertDialogDescription>
         </AlertDialogHeader>

@@ -26,21 +26,19 @@ export function TitleEditor({ value, onChange }: TitleEditorProps) {
   };
 
   return (
-    <div className="space-y-2">
-      <input
-        type="text"
-        value={localValue}
-        onChange={(e) => setLocalValue(e.target.value)}
-        onBlur={handleBlur}
-        onKeyDown={handleKeyDown}
-        placeholder="Untitled"
-        className={cn(
-          "w-full text-3xl font-semibold text-foreground tracking-tight",
-          "bg-transparent border-none outline-none",
-          "focus:ring-0 focus:outline-none",
-          "placeholder:text-muted-foreground"
-        )}
-      />
-    </div>
+    <input
+      type="text"
+      value={localValue}
+      onChange={(e) => setLocalValue(e.target.value)}
+      onBlur={handleBlur}
+      onKeyDown={handleKeyDown}
+      placeholder="Untitled"
+      className={cn(
+        "w-full text-3xl font-semibold text-foreground tracking-tight block",
+        "bg-transparent border-none outline-none",
+        "focus:ring-0 focus:outline-none",
+        "placeholder:text-muted-foreground"
+      )}
+    />
   );
 }

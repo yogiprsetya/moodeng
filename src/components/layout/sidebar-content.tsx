@@ -160,7 +160,7 @@ export function SidebarContent() {
       </SidebarGroup>
 
       <SidebarGroup>
-        <SidebarGroupLabel className="justify-between">
+        <SidebarGroupLabel className="justify-between pr-0">
           <span>Folders</span>
 
           <Button

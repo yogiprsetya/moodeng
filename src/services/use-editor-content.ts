@@ -64,9 +64,36 @@ export const useEditorContent = () => {
     [noteId, setSyncStatus]
   );
 
+  const updateFolder = useCallback(
+    async (folderId: string | null) => {
+      // Save to database if we have a note ID
+      if (noteId) {
+        try {
+          await db.updateNote(noteId, {
+            folderId,
+            updatedAt: Date.now(),
+          });
+          // Trigger a custom event to notify other components
+          window.dispatchEvent(
+            new CustomEvent("note-updated", { detail: { noteId } })
+          );
+        } catch (err) {
+          toast.error("Failed to update note folder", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "An unexpected error occurred",
+          });
+        }
+      }
+    },
+    [noteId]
+  );
+
   return {
     content: note,
     updateTitle,
     updateContent,
+    updateFolder,
   };
 };
