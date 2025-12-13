@@ -201,6 +201,12 @@ export function SidebarContent() {
 
                     <DropdownMenuContent side="right" align="start">
                       <DropdownMenuItem
+                        onClick={() => handleCreateNewNote(collection.id)}
+                      >
+                        Add Notes to Collection
+                      </DropdownMenuItem>
+
+                      <DropdownMenuItem
                         onClick={() => setDeleteCollectionId(collection.id)}
                         variant="destructive"
                       >
