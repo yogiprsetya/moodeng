@@ -12,81 +12,68 @@ import {
   Quote,
 } from "lucide-react";
 
-interface ToolbarButtonConfig {
-  icon: typeof Bold;
-  label: string;
-  type: "text" | "line";
-  before?: string;
-  after?: string;
-  prefix?: string;
-}
+const toolbarButtons = [
+  {
+    icon: Bold,
+    label: "Bold",
+    type: "text" as const,
+    before: "**",
+    after: "**",
+  },
+  {
+    icon: Italic,
+    label: "Italic",
+    type: "text" as const,
+    before: "_",
+    after: "_",
+  },
+  {
+    icon: Heading1,
+    label: "Heading 1",
+    type: "line" as const,
+    prefix: "# ",
+  },
+  {
+    icon: Heading2,
+    label: "Heading 2",
+    type: "line" as const,
+    prefix: "## ",
+  },
+  {
+    icon: Heading3,
+    label: "Heading 3",
+    type: "line" as const,
+    prefix: "### ",
+  },
+  { icon: List, label: "Bullet List", type: "line" as const, prefix: "- " },
+  {
+    icon: ListOrdered,
+    label: "Numbered List",
+    type: "line" as const,
+    prefix: "1. ",
+  },
+  { icon: Quote, label: "Quote", type: "line" as const, prefix: "> " },
+  {
+    icon: Code,
+    label: "Code",
+    type: "text" as const,
+    before: "`",
+    after: "`",
+  },
+  {
+    icon: Link,
+    label: "Link",
+    type: "text" as const,
+    before: "[",
+    after: "](url)",
+  },
+];
 
 export function useToolbar(
   value: string,
   onChange: (value: string) => void,
   textareaRef: React.RefObject<HTMLTextAreaElement | null>
 ) {
-  // Toolbar button configurations
-  const toolbarButtons: ToolbarButtonConfig[] = useMemo(
-    () => [
-      {
-        icon: Bold,
-        label: "Bold",
-        type: "text" as const,
-        before: "**",
-        after: "**",
-      },
-      {
-        icon: Italic,
-        label: "Italic",
-        type: "text" as const,
-        before: "_",
-        after: "_",
-      },
-      {
-        icon: Heading1,
-        label: "Heading 1",
-        type: "line" as const,
-        prefix: "# ",
-      },
-      {
-        icon: Heading2,
-        label: "Heading 2",
-        type: "line" as const,
-        prefix: "## ",
-      },
-      {
-        icon: Heading3,
-        label: "Heading 3",
-        type: "line" as const,
-        prefix: "### ",
-      },
-      { icon: List, label: "Bullet List", type: "line" as const, prefix: "- " },
-      {
-        icon: ListOrdered,
-        label: "Numbered List",
-        type: "line" as const,
-        prefix: "1. ",
-      },
-      { icon: Quote, label: "Quote", type: "line" as const, prefix: "> " },
-      {
-        icon: Code,
-        label: "Code",
-        type: "text" as const,
-        before: "`",
-        after: "`",
-      },
-      {
-        icon: Link,
-        label: "Link",
-        type: "text" as const,
-        before: "[",
-        after: "](url)",
-      },
-    ],
-    []
-  );
-
   // Create handlers - ref access happens only when handlers are called (in event handlers)
   const createTextHandler = useCallback(
     (before: string, after: string) => () => {

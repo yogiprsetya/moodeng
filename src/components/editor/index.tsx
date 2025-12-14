@@ -8,7 +8,7 @@ export const Editor = () => {
     useEditorContent();
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-5">
       <FolderSelector
         value={content?.folderId ?? null}
         onChange={updateFolder}

@@ -13,6 +13,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
 import { useWorkspace } from "~/services/use-workspace";
+import { ButtonGroup } from "../ui/button-group";
 
 export function Topbar() {
   const { syncStatus } = useEditorStore();
@@ -58,16 +59,12 @@ export function Topbar() {
               </MenubarMenu>
 
               <MenubarMenu>
-                <MenubarTrigger>Backup</MenubarTrigger>
+                <MenubarTrigger>Export</MenubarTrigger>
 
                 <MenubarContent>
-                  <MenubarItem onClick={() => handleCreateNewNote(null)}>
-                    Export to MD
-                  </MenubarItem>
+                  <MenubarItem>Markdown Format</MenubarItem>
 
-                  <MenubarItem onClick={() => handleCreateNewNote(null)}>
-                    Export to JSON
-                  </MenubarItem>
+                  <MenubarItem>JSON Format</MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
 
@@ -75,6 +72,33 @@ export function Topbar() {
                 <MenubarTrigger>Setting</MenubarTrigger>
               </MenubarMenu>
             </Menubar>
+
+            <ButtonGroup>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="sm" variant="ghost" className="text-sm">
+                    Sync
+                  </Button>
+                </TooltipTrigger>
+
+                <TooltipContent align="end" side="bottom">
+                  Sync your local data from the cloud.
+                </TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button size="sm" variant="ghost" className="text-sm">
+                    Backup
+                  </Button>
+                </TooltipTrigger>
+
+                <TooltipContent align="start" side="bottom">
+                  Data on your device, not automatically <br />
+                  uploaded to the cloud.
+                </TooltipContent>
+              </Tooltip>
+            </ButtonGroup>
 
             <div className="flex items-center gap-2">
               <Tooltip open={syncStatus === "saving"}>
