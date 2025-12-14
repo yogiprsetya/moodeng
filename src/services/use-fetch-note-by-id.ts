@@ -29,7 +29,6 @@ export const useFetchNoteById = (options: UseFetchNoteByIdOptions) => {
       setIsLoading(true);
 
       const fetchedNote = await db.getNote(noteId);
-      console.log(fetchedNote);
       setNote(fetchedNote);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Failed to fetch note");

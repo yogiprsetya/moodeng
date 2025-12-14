@@ -14,12 +14,20 @@ import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
 import { useWorkspace } from "~/services/use-workspace";
 import { ButtonGroup } from "../ui/button-group";
+import { useState, lazy, Suspense } from "react";
+
+const SettingsDialog = lazy(() =>
+  import("../common/settings-dialog").then((module) => ({
+    default: module.SettingsDialog,
+  }))
+);
 
 export function Topbar() {
   const { syncStatus } = useEditorStore();
   const { handleCreateNewNote } = useNotes();
   const { toggleSidebar } = useSidebar();
-  const { workspace } = useWorkspace();
+  const { workspace, refetch: refetchWorkspace } = useWorkspace();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur-md supports-backdrop-filter:bg-background/80">
@@ -70,8 +78,24 @@ export function Topbar() {
 
               <MenubarMenu>
                 <MenubarTrigger>Setting</MenubarTrigger>
+                <MenubarContent>
+                  <MenubarItem onClick={() => setSettingsOpen(true)}>
+                    Workspace Settings
+                  </MenubarItem>
+                </MenubarContent>
               </MenubarMenu>
             </Menubar>
+
+            {workspace?.title && (
+              <Suspense fallback={null}>
+                <SettingsDialog
+                  open={settingsOpen}
+                  onOpenChange={setSettingsOpen}
+                  currentTitle={workspace.title}
+                  onSave={refetchWorkspace}
+                />
+              </Suspense>
+            )}
 
             <ButtonGroup>
               <Tooltip>
