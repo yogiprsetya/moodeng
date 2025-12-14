@@ -14,7 +14,10 @@ import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
 import { useWorkspace } from "~/services/use-workspace";
 import { ButtonGroup } from "../ui/button-group";
-import { useState, lazy, Suspense } from "react";
+import { useState, lazy, Suspense, useCallback } from "react";
+import { useParams } from "@tanstack/react-router";
+import { exportNoteAsMarkdown } from "~/utils/export-note";
+import { toast } from "sonner";
 
 const SettingsDialog = lazy(() =>
   import("../common/settings-dialog").then((module) => ({
@@ -28,6 +31,24 @@ export function Topbar() {
   const { toggleSidebar } = useSidebar();
   const { workspace, refetch: refetchWorkspace } = useWorkspace();
   const [settingsOpen, setSettingsOpen] = useState(false);
+
+  // Get current note ID from route params (if on note page)
+  const params = useParams({ strict: false });
+  const noteId = params?.id as string | undefined;
+
+  const handleExportMarkdown = useCallback(async () => {
+    if (!noteId) {
+      toast.error("No note selected. Please open a note to export.");
+      return;
+    }
+    try {
+      await exportNoteAsMarkdown(noteId);
+      toast.success("Note exported as Markdown");
+    } catch (error) {
+      toast.error("Failed to export note");
+      console.error("Export error:", error);
+    }
+  }, [noteId]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur-md supports-backdrop-filter:bg-background/80">
@@ -70,9 +91,12 @@ export function Topbar() {
                 <MenubarTrigger>Export</MenubarTrigger>
 
                 <MenubarContent>
-                  <MenubarItem>Markdown Format</MenubarItem>
-
-                  <MenubarItem>JSON Format</MenubarItem>
+                  <MenubarItem
+                    onClick={handleExportMarkdown}
+                    disabled={!noteId}
+                  >
+                    Markdown Format (.md)
+                  </MenubarItem>
                 </MenubarContent>
               </MenubarMenu>
 
@@ -85,17 +109,6 @@ export function Topbar() {
                 </MenubarContent>
               </MenubarMenu>
             </Menubar>
-
-            {workspace?.title && (
-              <Suspense fallback={null}>
-                <SettingsDialog
-                  open={settingsOpen}
-                  onOpenChange={setSettingsOpen}
-                  currentTitle={workspace.title}
-                  onSave={refetchWorkspace}
-                />
-              </Suspense>
-            )}
 
             <ButtonGroup>
               <Tooltip>
@@ -144,6 +157,17 @@ export function Topbar() {
           </div>
         </div>
       </div>
+
+      {workspace?.title && (
+        <Suspense fallback={null}>
+          <SettingsDialog
+            open={settingsOpen}
+            onOpenChange={setSettingsOpen}
+            currentTitle={workspace.title}
+            onSave={refetchWorkspace}
+          />
+        </Suspense>
+      )}
     </header>
   );
 }
