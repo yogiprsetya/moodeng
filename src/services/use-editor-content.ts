@@ -8,7 +8,7 @@ import { useEditorStore } from "~/stores/editor-store";
 export const useEditorContent = () => {
   const { id: noteId } = useParams({ strict: false });
 
-  const { note } = useFetchNoteById({ noteId });
+  const { note, refetch: refetchNote } = useFetchNoteById({ noteId });
   const { setSyncStatus } = useEditorStore();
 
   const updateTitle = useCallback(
@@ -26,6 +26,7 @@ export const useEditorContent = () => {
           window.dispatchEvent(
             new CustomEvent("note-updated", { detail: { noteId } })
           );
+          refetchNote();
         } catch (err) {
           toast.error("Failed to update note title", {
             description:
@@ -36,12 +37,13 @@ export const useEditorContent = () => {
         }
       }
     },
-    [noteId]
+    [noteId, refetchNote]
   );
 
   const updateContent = useCallback(
     async (newContent: string) => {
       setSyncStatus("saving");
+
       // Save to database if we have a note ID
       if (noteId) {
         try {
@@ -49,6 +51,9 @@ export const useEditorContent = () => {
             content: newContent,
             updatedAt: Date.now(),
           });
+          window.dispatchEvent(
+            new CustomEvent("note-updated", { detail: { noteId } })
+          );
         } catch (err) {
           toast.error("Failed to update note content", {
             description:
@@ -73,10 +78,7 @@ export const useEditorContent = () => {
             folderId,
             updatedAt: Date.now(),
           });
-          // Trigger a custom event to notify other components
-          window.dispatchEvent(
-            new CustomEvent("note-updated", { detail: { noteId } })
-          );
+          refetchNote();
         } catch (err) {
           toast.error("Failed to update note folder", {
             description:
@@ -87,7 +89,7 @@ export const useEditorContent = () => {
         }
       }
     },
-    [noteId]
+    [noteId, refetchNote]
   );
 
   return {
