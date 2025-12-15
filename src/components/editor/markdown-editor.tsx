@@ -14,9 +14,11 @@ interface MarkdownEditorProps {
 }
 
 export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
-  const { viewMode, setViewMode } = useEditorStore();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [localValue, setLocalValue] = useState(value);
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const { viewMode, setViewMode } = useEditorStore();
 
   const debouncedOnChange = useDebouncedCallback(onChange, 2000);
 
@@ -63,7 +65,6 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
             <textarea
               ref={textareaRef}
               value={localValue}
-              onBlur={(e) => onChange(e.target.value)}
               onChange={(e) => handleChange(e.target.value)}
               placeholder="Start writing ..."
               className="flex-1 w-full p-6 min-h-[550px] resize-none outline-none bg-background text-foreground leading-relaxed"

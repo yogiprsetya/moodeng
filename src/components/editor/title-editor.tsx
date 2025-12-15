@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { cn } from "~/utils/css";
+import { usePrevious } from "~/hooks/use-previous";
 
 interface TitleEditorProps {
   value: string;
@@ -8,6 +9,7 @@ interface TitleEditorProps {
 
 export function TitleEditor({ value, onChange }: TitleEditorProps) {
   const [localValue, setLocalValue] = useState(value);
+  const previousValue = usePrevious(value);
 
   // Sync local value when prop changes
   useEffect(() => {
@@ -15,7 +17,11 @@ export function TitleEditor({ value, onChange }: TitleEditorProps) {
   }, [value]);
 
   const handleBlur = () => {
-    onChange(localValue.trim() || "");
+    const trimmedValue = localValue.trim() || "";
+    // Only trigger onChange if the value has changed (dirty)
+    if (trimmedValue !== previousValue) {
+      onChange(trimmedValue);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
