@@ -1,17 +1,17 @@
 import { Link, useParams, useNavigate } from "@tanstack/react-router";
-import { Search, Folder, Plus, MoreHorizontal } from "lucide-react";
+import { Folder, Plus, MoreHorizontal } from "lucide-react";
 import { useMemo, useState, lazy, Suspense } from "react";
 import {
   SidebarContent as SidebarContentWrapper,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
-  SidebarInput,
   SidebarMenu,
   SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
 } from "~/components/ui/sidebar";
+import { SearchField } from "~/components/ui/search-field";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useNotes } from "~/services/use-notes";
@@ -147,16 +147,10 @@ export function SidebarContent() {
     <SidebarContentWrapper>
       <SidebarGroup className="mt-4">
         <SidebarGroupContent>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-
-            <SidebarInput
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-9"
-            />
-          </div>
+          <SearchField
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </SidebarGroupContent>
       </SidebarGroup>
 
