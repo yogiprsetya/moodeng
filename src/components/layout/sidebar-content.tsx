@@ -1,5 +1,5 @@
 import { Link, useParams, useNavigate } from "@tanstack/react-router";
-import { Folder, Plus, MoreHorizontal } from "lucide-react";
+import { Folder, Plus, MoreHorizontal, Pin, PinOff } from "lucide-react";
 import { useMemo, useState, lazy, Suspense } from "react";
 import {
   SidebarContent as SidebarContentWrapper,
@@ -55,8 +55,14 @@ export function SidebarContent() {
   const params = useParams({ strict: false });
   const currentNoteId = params?.id;
 
-  const { notes, isLoading, handleCreateNewNote, handleDeleteNote, refetch } =
-    useNotes();
+  const {
+    notes,
+    isLoading,
+    handleCreateNewNote,
+    handleDeleteNote,
+    handleTogglePin,
+    refetch,
+  } = useNotes();
 
   const {
     collections,
@@ -65,12 +71,21 @@ export function SidebarContent() {
   } = useFetchCollections();
 
   const filteredNotes = useMemo(() => {
-    return notes.filter((note) => {
+    const filtered = notes.filter((note) => {
       const matchesSearch =
         !searchQuery ||
         note.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFolder = !selectedFolder || note.folderId === selectedFolder;
       return matchesSearch && matchesFolder;
+    });
+
+    // Sort: pinned notes first, then by updatedAt (most recent first)
+    return filtered.sort((a, b) => {
+      // Pinned notes come first
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      // Within same pin status, sort by updatedAt (most recent first)
+      return b.updatedAt - a.updatedAt;
     });
   }, [notes, searchQuery, selectedFolder]);
 
@@ -257,6 +272,9 @@ export function SidebarContent() {
                       tooltip={note.title}
                     >
                       <Link to="/n/$id" params={{ id: note.id }}>
+                        {note.isPinned && (
+                          <Pin className="shrink-0" fill="currentColor" />
+                        )}
                         <span className="truncate">{note.title}</span>
                       </Link>
                     </SidebarMenuButton>
@@ -269,6 +287,17 @@ export function SidebarContent() {
                       </DropdownMenuTrigger>
 
                       <DropdownMenuContent side="right" align="start">
+                        <DropdownMenuItem
+                          onClick={() => handleTogglePin(note.id)}
+                        >
+                          {note.isPinned ? (
+                            <PinOff />
+                          ) : (
+                            <Pin className="size-4" />
+                          )}
+                          {note.isPinned ? "Unpin Note" : "Pin Note"}
+                        </DropdownMenuItem>
+
                         <DropdownMenuItem>Read-only view</DropdownMenuItem>
 
                         <DropdownMenuItem

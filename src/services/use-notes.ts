@@ -62,11 +62,27 @@ export const useNotes = () => {
     [fetchNotes]
   );
 
+  const handleTogglePin = useCallback(
+    async (noteId: string) => {
+      try {
+        const note = notes.find((n) => n.id === noteId);
+        if (!note) return;
+
+        await db.updateNote(noteId, { isPinned: !note.isPinned });
+        fetchNotes(); // Refresh the notes list
+      } catch (err) {
+        console.error("Error toggling pin:", err);
+      }
+    },
+    [notes, fetchNotes]
+  );
+
   return {
     isLoading,
     notes,
     handleCreateNewNote,
     handleDeleteNote,
+    handleTogglePin,
     refetch: fetchNotes,
   };
 };
