@@ -1,46 +1,28 @@
 import type { Theme, ThemeName } from "~/types/theme";
 
 export const themes: Record<ThemeName, Theme> = {
-  default: {
-    name: "default",
-    displayName: "Default",
-    colorScheme: "light",
-    primaryHue: 250,
-    saturation: 0.02,
+  miro: {
+    name: "miro",
+    displayName: "Miro",
   },
-  warm: {
-    name: "warm",
-    displayName: "Warm",
-    colorScheme: "light",
-    primaryHue: 40,
-    saturation: 0.03,
+  lofi: {
+    name: "lofi",
+    displayName: "Lo-Fi",
   },
-  cool: {
-    name: "cool",
-    displayName: "Cool",
-    colorScheme: "light",
-    primaryHue: 220,
-    saturation: 0.02,
+  nord: {
+    name: "nord",
+    displayName: "Nord",
   },
-  sepia: {
-    name: "sepia",
-    displayName: "Sepia",
-    colorScheme: "light",
-    primaryHue: 50,
-    saturation: 0.04,
+  "tokyo-night": {
+    name: "tokyo-night",
+    displayName: "Tokyo Night",
   },
-  dark: {
-    name: "dark",
-    displayName: "Dark",
-    colorScheme: "dark",
-    primaryHue: 250,
-    saturation: 0.01,
+  valentine: {
+    name: "valentine",
+    displayName: "Valentine",
   },
-  "dark-warm": {
-    name: "dark-warm",
-    displayName: "Dark Warm",
-    colorScheme: "dark",
-    primaryHue: 40,
-    saturation: 0.012,
+  winter: {
+    name: "winter",
+    displayName: "Winter",
   },
 };

@@ -84,7 +84,6 @@ export function ThemeSetting() {
               {(Object.values(themes) as (typeof themes)[ThemeName][]).map(
                 (theme) => {
                   const isSelected = currentTheme === theme.name;
-                  const isDarkTheme = theme.colorScheme === "dark";
 
                   return (
                     <button
@@ -102,18 +101,9 @@ export function ThemeSetting() {
                     >
                       <div className="flex items-center justify-between w-full">
                         <span className="font-medium">{theme.displayName}</span>
-
-                        {isDarkTheme && (
-                          <Moon className="size-4 text-muted-foreground" />
-                        )}
                       </div>
 
-                      <div
-                        className={cn(
-                          "w-full h-8 rounded-md border",
-                          isDarkTheme ? "bg-zinc-900" : "bg-zinc-50"
-                        )}
-                      />
+                      <div className="w-full h-8 rounded-md border bg-muted" />
                     </button>
                   );
                 }

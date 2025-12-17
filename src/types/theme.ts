@@ -1,17 +1,14 @@
 export type ThemeName =
-  | "default"
-  | "warm"
-  | "cool"
-  | "sepia"
-  | "dark"
-  | "dark-warm";
+  | "miro"
+  | "lofi"
+  | "nord"
+  | "tokyo-night"
+  | "valentine"
+  | "winter";
 
 export type ColorScheme = "light" | "dark" | "auto";
 
 export interface Theme {
   name: ThemeName;
   displayName: string;
-  colorScheme: ColorScheme;
-  primaryHue: number;
-  saturation: number;
 }

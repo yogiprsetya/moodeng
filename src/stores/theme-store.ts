@@ -1,16 +1,13 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { themes } from "~/constants/themes";
 import type { ColorScheme, ThemeName } from "~/types/theme";
 
 const STORAGE_KEY = "moodeng-theme";
 
 function applyTheme(themeName: ThemeName, colorScheme: ColorScheme) {
-  const theme = themes[themeName];
-
   // Determine if we should use dark mode
   let isDark = false;
-  if (colorScheme === "dark" || theme.colorScheme === "dark") {
+  if (colorScheme === "dark") {
     isDark = true;
   } else if (colorScheme === "auto") {
     isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -23,11 +20,8 @@ function applyTheme(themeName: ThemeName, colorScheme: ColorScheme) {
     document.documentElement.classList.remove("dark");
   }
 
-  // Apply theme-specific CSS variables
-  const root = document.documentElement;
-  root.style.setProperty("--theme-hue", theme.primaryHue.toString());
-  root.style.setProperty("--theme-saturation", theme.saturation.toString());
-  root.setAttribute("data-theme", themeName);
+  // Apply theme data attribute
+  document.documentElement.setAttribute("data-theme", themeName);
 }
 
 interface ThemeStore {
@@ -41,14 +35,12 @@ interface ThemeStore {
 export const useThemeStore = create<ThemeStore>()(
   persist(
     (set, get) => ({
-      currentTheme: "default",
+      currentTheme: "nord",
       colorScheme: "auto",
 
       setTheme: (theme: ThemeName) => {
-        const themeConfig = themes[theme];
         set({
           currentTheme: theme,
-          colorScheme: themeConfig.colorScheme,
         });
         get().applyTheme();
       },
