@@ -16,7 +16,6 @@ import { useWorkspace } from "~/services/use-workspace";
 import { ButtonGroup } from "../ui/button-group";
 import { useState, lazy, Suspense, useCallback } from "react";
 import { useParams } from "@tanstack/react-router";
-import { exportNoteAsMarkdown } from "~/utils/export-note";
 import { toast } from "sonner";
 
 const SettingsDialog = lazy(() =>
@@ -27,7 +26,7 @@ const SettingsDialog = lazy(() =>
 
 export function Topbar() {
   const { syncStatus } = useEditorStore();
-  const { handleCreateNewNote } = useNotes();
+  const { handleCreateNewNote, exportNoteAsMarkdown } = useNotes();
   const { toggleSidebar } = useSidebar();
   const { workspace, refetch: refetchWorkspace } = useWorkspace();
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -48,7 +47,7 @@ export function Topbar() {
       toast.error("Failed to export note");
       console.error("Export error:", error);
     }
-  }, [noteId]);
+  }, [noteId, exportNoteAsMarkdown]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur-md supports-backdrop-filter:bg-background/80">

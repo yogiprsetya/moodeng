@@ -15,7 +15,7 @@ import { SearchField } from "~/components/ui/search-field";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { useNotes } from "~/services/use-notes";
-import { useFetchCollections } from "~/services/use-fetch-collections";
+import { useCollections } from "~/services/use-collections";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +36,7 @@ const DeleteCollectionDialog = lazy(() =>
 );
 
 const AddFolderDialog = lazy(() =>
-  import("../common/add-folder").then((m) => ({
+  import("../common/add-folder-dialog").then((m) => ({
     default: m.AddFolderDialog,
   }))
 );
@@ -67,8 +67,8 @@ export function SidebarContent() {
   const {
     collections,
     isLoading: isLoadingCollections,
-    refetch: refetchCollections,
-  } = useFetchCollections();
+    deleteCollection,
+  } = useCollections();
 
   const filteredNotes = useMemo(() => {
     const filtered = notes.filter((note) => {
@@ -130,8 +130,7 @@ export function SidebarContent() {
   const handleConfirmDeleteCollection = async (cascadeDelete: boolean) => {
     if (!deleteCollectionId) return;
 
-    const { db } = await import("~/api/browser/db");
-    await db.deleteCollectionWithNotes(deleteCollectionId, cascadeDelete);
+    await deleteCollection(deleteCollectionId, cascadeDelete);
 
     // If we're viewing a note in this collection and cascade delete is true, navigate away
     if (cascadeDelete && currentNoteId) {
@@ -154,8 +153,6 @@ export function SidebarContent() {
     }
 
     setDeleteCollectionId(null);
-    refetchCollections();
-    refetch();
   };
 
   return (
@@ -340,8 +337,8 @@ export function SidebarContent() {
           open={isAddFolderOpen}
           onOpenChange={setIsAddFolderOpen}
           onFolderCreated={() => {
-            // Refresh collections and notes
-            refetchCollections();
+            // Collections are automatically refetched by the hook
+            // Only refetch notes if needed
             refetch();
           }}
         />

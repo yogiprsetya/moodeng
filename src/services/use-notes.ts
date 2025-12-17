@@ -77,12 +77,38 @@ export const useNotes = () => {
     [notes, fetchNotes]
   );
 
+  const exportNoteAsMarkdown = useCallback(
+    async (noteId: string): Promise<void> => {
+      const note = await db.getNote(noteId);
+
+      if (!note) {
+        throw new Error("Note not found");
+      }
+
+      // Import utility functions
+      const { exportNoteToMarkdown, downloadFile } = await import(
+        "~/utils/export-note"
+      );
+
+      const markdown = exportNoteToMarkdown(note);
+      const sanitizedTitle = (note.title || "Untitled Note")
+        .replace(/[<>:"/\\|?*]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .substring(0, 100);
+      const filename = `${sanitizedTitle}.md`;
+      downloadFile(markdown, filename, "text/markdown");
+    },
+    []
+  );
+
   return {
     isLoading,
     notes,
     handleCreateNewNote,
     handleDeleteNote,
     handleTogglePin,
+    exportNoteAsMarkdown,
     refetch: fetchNotes,
   };
 };

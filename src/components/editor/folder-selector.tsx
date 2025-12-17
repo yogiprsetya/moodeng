@@ -6,7 +6,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from "~/components/ui/dropdown-menu";
-import { useFetchCollections } from "~/services/use-fetch-collections";
+import { useCollections } from "~/services/use-collections";
 import { Button } from "../ui/button";
 
 interface FolderSelectorProps {
@@ -15,7 +15,7 @@ interface FolderSelectorProps {
 }
 
 export function FolderSelector({ value, onChange }: FolderSelectorProps) {
-  const { collections, isLoading } = useFetchCollections();
+  const { collections, isLoading } = useCollections();
 
   const selectedCollection = collections.find((c) => c.id === value);
 

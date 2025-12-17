@@ -9,7 +9,7 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { db } from "~/api/browser/db";
+import { useCollections } from "~/services/use-collections";
 import type { Collection } from "~/types/note";
 
 interface AddFolderDialogProps {
@@ -25,6 +25,7 @@ export function AddFolderDialog({
 }: AddFolderDialogProps) {
   const [folderName, setFolderName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
+  const { createCollection } = useCollections();
 
   const handleCreate = async () => {
     if (!folderName.trim()) {
@@ -33,18 +34,7 @@ export function AddFolderDialog({
 
     setIsCreating(true);
     try {
-      const newCollection: Collection = {
-        id: crypto.randomUUID(),
-        name: folderName.trim(),
-        createdAt: Date.now(),
-        updatedAt: Date.now(),
-        deleted: false,
-        syncStatus: "pending",
-        icon: "",
-        labelColor: "",
-      };
-
-      await db.createCollection(newCollection);
+      const newCollection = await createCollection(folderName);
       onFolderCreated?.(newCollection);
       setFolderName("");
       onOpenChange(false);

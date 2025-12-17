@@ -1,5 +1,4 @@
 import type { Note } from "~/types/note";
-import { db } from "~/api/browser/db";
 
 /**
  * Export a note to markdown format
@@ -34,35 +33,4 @@ export function downloadFile(
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
-}
-
-/**
- * Export a note to markdown file and trigger download
- * Fetches the latest version of the note from the database
- * @param noteId - The ID of the note to export
- */
-export async function exportNoteAsMarkdown(noteId: string): Promise<void> {
-  const note = await db.getNote(noteId);
-
-  if (!note) {
-    throw new Error("Note not found");
-  }
-
-  const markdown = exportNoteToMarkdown(note);
-  const filename = `${sanitizeFilename(note.title || "Untitled Note")}.md`;
-  downloadFile(markdown, filename, "text/markdown");
-}
-
-/**
- * Sanitize a filename by removing invalid characters
- * @param filename - The filename to sanitize
- * @returns The sanitized filename
- */
-function sanitizeFilename(filename: string): string {
-  // Remove invalid characters for filenames
-  return filename
-    .replace(/[<>:"/\\|?*]/g, "")
-    .replace(/\s+/g, " ")
-    .trim()
-    .substring(0, 100); // Limit length
 }
