@@ -48,3 +48,21 @@ Folder to group a notes
   "labelColor": string,
 }
 ```
+
+# Histories
+
+Append-only change log for a note (audit trail / undo / sync help).
+
+```
+{
+  "id": uuid,
+  "noteId": uuid,
+  "type": created | updated | moved | deleted | restored,
+  "payload": {
+    // event-specific data (e.g. { "title": "...", "content": "..." } or { "fromFolderId": uuid|null, "toFolderId": uuid|null })
+  },
+  "createdAt": timestamp,
+  "deleted": false,
+  "syncStatus": pending | synced | conflicted,
+}
+```

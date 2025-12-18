@@ -1,10 +1,11 @@
 const DB_NAME = "moodeng-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 
 export const STORES = {
   WORKSPACE: "workspace",
   NOTES: "notes",
   COLLECTIONS: "collections",
+  HISTORIES: "histories",
 } as const;
 
 /**
@@ -68,6 +69,18 @@ export class DBDriver {
             unique: false,
           });
           collectionsStore.createIndex("updatedAt", "updatedAt", {
+            unique: false,
+          });
+        }
+
+        // Create histories store with indexes
+        if (!db.objectStoreNames.contains(STORES.HISTORIES)) {
+          const historiesStore = db.createObjectStore(STORES.HISTORIES, {
+            keyPath: "id",
+          });
+          historiesStore.createIndex("noteId", "noteId", { unique: false });
+          historiesStore.createIndex("type", "type", { unique: false });
+          historiesStore.createIndex("createdAt", "createdAt", {
             unique: false,
           });
         }
