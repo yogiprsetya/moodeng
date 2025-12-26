@@ -10,7 +10,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "~/components/ui/sheet";
-import { useHistories } from "~/services/use-histories";
+import { useDataStore } from "~/stores/data-store";
+import { useEffect } from "react";
 import type { History } from "~/types/history";
 import { cn } from "~/utils/css";
 
@@ -77,7 +78,15 @@ export function HistorySheet(props: {
   const params = useParams({ strict: false });
   const noteId = params?.id as string | undefined;
 
-  const { histories, isLoading } = useHistories({ noteId, limit: 200 });
+  const {
+    histories,
+    isLoadingHistories: isLoading,
+    loadHistories,
+  } = useDataStore();
+
+  useEffect(() => {
+    loadHistories(noteId, 200);
+  }, [noteId, loadHistories]);
 
   const emptyText = useMemo(() => {
     if (!noteId) return "Open a note to see its history.";

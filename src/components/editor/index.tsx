@@ -1,8 +1,11 @@
 import { MarkdownEditor } from "./markdown-editor";
 import { TitleEditor } from "./title-editor";
 import { FolderSelector } from "./folder-selector";
-import { useEditorContent } from "~/services/use-editor-content";
-import { useState, lazy, Suspense } from "react";
+import { useParams } from "@tanstack/react-router";
+import { useState, lazy, Suspense, useCallback, useEffect } from "react";
+import { toast } from "sonner";
+import { useDataStore } from "~/stores/data-store";
+import { useEditorStore } from "~/stores/editor-store";
 import { Button } from "~/components/ui/button";
 import { Clock } from "lucide-react";
 
@@ -13,8 +16,96 @@ const HistorySheet = lazy(() =>
 );
 
 export const Editor = () => {
-  const { content, updateTitle, updateContent, updateFolder } =
-    useEditorContent();
+  const { id: noteId } = useParams({ strict: false });
+  const { getNote, updateNote, loadNotes } = useDataStore();
+  const { setSyncStatus } = useEditorStore();
+
+  // Get note from store
+  const note = useDataStore((state) =>
+    noteId ? state.notes.find((n) => n.id === noteId) : null
+  );
+
+  // Load note if not in store
+  useEffect(() => {
+    if (noteId && !note) {
+      getNote(noteId);
+    }
+  }, [noteId, note, getNote]);
+
+  const updateTitle = useCallback(
+    async (newTitle: string) => {
+      const trimmedTitle = newTitle.trim() || "";
+
+      if (noteId) {
+        try {
+          await updateNote(noteId, {
+            title: trimmedTitle,
+            updatedAt: Date.now(),
+          });
+          // Reload notes to update sidebar
+          await loadNotes();
+        } catch (err) {
+          toast.error("Failed to update note title", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "An unexpected error occurred",
+          });
+        }
+      }
+    },
+    [noteId, updateNote, loadNotes]
+  );
+
+  const updateContent = useCallback(
+    async (newContent: string) => {
+      setSyncStatus("saving");
+
+      if (noteId) {
+        try {
+          await updateNote(noteId, {
+            content: newContent,
+            updatedAt: Date.now(),
+          });
+        } catch (err) {
+          toast.error("Failed to update note content", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "An unexpected error occurred",
+          });
+        } finally {
+          setTimeout(() => setSyncStatus("saved"), 1000);
+        }
+      }
+    },
+    [noteId, updateNote, setSyncStatus]
+  );
+
+  const updateFolder = useCallback(
+    async (folderId: string | null) => {
+      if (noteId) {
+        try {
+          await updateNote(noteId, {
+            folderId,
+            updatedAt: Date.now(),
+          });
+          // Reload notes to update sidebar
+          await loadNotes();
+        } catch (err) {
+          toast.error("Failed to update note folder", {
+            description:
+              err instanceof Error
+                ? err.message
+                : "An unexpected error occurred",
+          });
+        }
+      }
+    },
+    [noteId, updateNote, loadNotes]
+  );
+
+  const content = note || null;
   const [historyOpen, setHistoryOpen] = useState(false);
 
   return (

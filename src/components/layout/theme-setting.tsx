@@ -1,5 +1,5 @@
 import { Palette, Moon, Sun, Monitor, type LucideIcon } from "lucide-react";
-import { useThemeStore } from "~/stores/theme-store";
+import { useWorkspaceStore } from "~/stores/data-workspace";
 import { type ThemeName, type ColorScheme } from "~/types/theme";
 import { Button } from "~/components/ui/button";
 import {
@@ -26,7 +26,7 @@ const colorSchemeOptions: {
 
 export function ThemeSetting() {
   const { currentTheme, colorScheme, setTheme, setColorScheme } =
-    useThemeStore();
+    useWorkspaceStore();
   const [open, setOpen] = useState(false);
 
   return (

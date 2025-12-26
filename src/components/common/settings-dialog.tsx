@@ -9,7 +9,7 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { useWorkspace } from "~/services/use-workspace";
+import { useWorkspaceStore } from "~/stores/data-workspace";
 import { Label } from "../ui/label";
 
 interface SettingsDialogProps {
@@ -25,7 +25,7 @@ export function SettingsDialog({
   currentTitle,
   onSave,
 }: SettingsDialogProps) {
-  const { workspace, updateWorkspace } = useWorkspace();
+  const { workspace, updateWorkspace } = useWorkspaceStore();
   const [title, setTitle] = useState(currentTitle);
 
   const handleSave = async () => {

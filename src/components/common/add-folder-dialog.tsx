@@ -9,7 +9,7 @@ import {
 } from "~/components/ui/dialog";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { useCollections } from "~/services/use-collections";
+import { useDataStore } from "~/stores/data-store";
 import type { Collection } from "~/types/note";
 
 interface AddFolderDialogProps {
@@ -25,7 +25,7 @@ export function AddFolderDialog({
 }: AddFolderDialogProps) {
   const [folderName, setFolderName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
-  const { createCollection } = useCollections();
+  const { createCollection } = useDataStore();
 
   const handleCreate = async () => {
     if (!folderName.trim()) {
@@ -34,7 +34,13 @@ export function AddFolderDialog({
 
     setIsCreating(true);
     try {
-      const newCollection = await createCollection(folderName);
+      const newCollection = await createCollection({
+        name: folderName.trim(),
+        deleted: false,
+        syncStatus: "pending",
+        icon: "",
+        labelColor: "",
+      });
       onFolderCreated?.(newCollection);
       setFolderName("");
       onOpenChange(false);
@@ -57,6 +63,7 @@ export function AddFolderDialog({
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create New Folder</DialogTitle>
+
           <DialogDescription>
             Enter a name for your new folder to organize your notes.
           </DialogDescription>

@@ -1,9 +1,9 @@
 import { useEffect, type ReactNode } from "react";
-import { useThemeStore } from "~/stores/theme-store";
+import { useWorkspaceStore } from "~/stores/data-workspace";
 
 // Provider component to initialize theme and listen to system changes
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const { currentTheme, colorScheme, applyTheme } = useThemeStore();
+  const { currentTheme, colorScheme, applyTheme } = useWorkspaceStore();
 
   useEffect(() => {
     // Apply theme on mount

@@ -1,7 +1,7 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
 import { Editor } from "~/components/editor";
 import { useEffect } from "react";
-import { useWorkspace } from "~/services/use-workspace";
+import { useWorkspaceStore } from "~/stores/data-workspace";
 
 export const Route = createFileRoute("/n/$id")({
   component: NotePage,
@@ -9,7 +9,7 @@ export const Route = createFileRoute("/n/$id")({
 
 function NotePage() {
   const { id } = useParams({ from: "/n/$id" });
-  const { workspace, updateLastNoteId } = useWorkspace();
+  const { workspace, updateLastNoteId } = useWorkspaceStore();
 
   useEffect(() => {
     if (workspace) {

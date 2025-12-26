@@ -14,8 +14,7 @@ import {
 import { SearchField } from "~/components/ui/search-field";
 import { Button } from "~/components/ui/button";
 import { ScrollArea } from "~/components/ui/scroll-area";
-import { useNotes } from "~/services/use-notes";
-import { useCollections } from "~/services/use-collections";
+import { useDataStore } from "~/stores/data-store";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -57,18 +56,46 @@ export function SidebarContent() {
 
   const {
     notes,
-    isLoading,
-    handleCreateNewNote,
-    handleDeleteNote,
-    handleTogglePin,
-    refetch,
-  } = useNotes();
-
-  const {
+    isLoadingNotes: isLoading,
     collections,
-    isLoading: isLoadingCollections,
-    deleteCollection,
-  } = useCollections();
+    isLoadingCollections,
+    createNote,
+    deleteNote,
+    togglePinNote,
+    loadNotes,
+    deleteCollectionWithNotes,
+    loadCollections,
+  } = useDataStore();
+
+  const handleCreateNewNote = async (selectedFolder?: string | null) => {
+    const folderId = selectedFolder ?? null;
+    const newNote = await createNote({
+      title: "Untitled Note",
+      content: "",
+      folderId,
+      deleted: false,
+      syncStatus: "pending",
+      icon: "",
+      labelColor: "",
+      isPinned: false,
+    });
+    navigate({ to: "/n/$id", params: { id: newNote.id } });
+  };
+
+  const handleDeleteNote = async (noteId: string) => {
+    await deleteNote(noteId);
+  };
+
+  const handleTogglePin = async (noteId: string) => {
+    await togglePinNote(noteId);
+  };
+
+  const deleteCollection = async (
+    collectionId: string,
+    cascadeDelete: boolean
+  ) => {
+    await deleteCollectionWithNotes(collectionId, cascadeDelete);
+  };
 
   const filteredNotes = useMemo(() => {
     const filtered = notes.filter((note) => {
@@ -337,9 +364,9 @@ export function SidebarContent() {
           open={isAddFolderOpen}
           onOpenChange={setIsAddFolderOpen}
           onFolderCreated={() => {
-            // Collections are automatically refetched by the hook
-            // Only refetch notes if needed
-            refetch();
+            // Reload collections and notes to update the sidebar
+            loadCollections();
+            loadNotes();
           }}
         />
       </Suspense>

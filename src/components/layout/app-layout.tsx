@@ -9,11 +9,19 @@ import {
 } from "~/components/ui/sidebar";
 import { Topbar } from "~/components/layout/topbar";
 import { SidebarContent as NotesSidebarContent } from "~/components/layout/sidebar-content";
-import { useWorkspace } from "~/services/use-workspace";
+import { useDataStore } from "~/stores/data-store";
+import { useWorkspaceStore } from "~/stores/data-workspace";
 import type { FC, ReactNode } from "react";
 
 export const AppLayout: FC<{ children: ReactNode }> = ({ children }) => {
-  const { workspace } = useWorkspace();
+  const { initialize } = useDataStore();
+  const { workspace, loadWorkspace } = useWorkspaceStore();
+
+  // Initialize store on mount
+  useEffect(() => {
+    initialize();
+    loadWorkspace();
+  }, [initialize, loadWorkspace]);
 
   useEffect(() => {
     if (workspace?.title) {

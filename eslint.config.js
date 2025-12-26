@@ -37,7 +37,7 @@ export default defineConfig([
     },
   },
   {
-    files: ["src/services/**/*.{ts,tsx}"],
+    files: ["src/services/**/*.{ts,tsx}", "src/stores/**/*.{ts,tsx}"],
     extends: [
       js.configs.recommended,
       tseslint.configs.recommended,

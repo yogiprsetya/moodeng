@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect } from "react";
-import { useWorkspace } from "~/services/use-workspace";
-import { useFetchNoteById } from "~/services/use-fetch-note-by-id";
+import { useDataStore } from "~/stores/data-store";
+import { useWorkspaceStore } from "~/stores/data-workspace";
 
 export const Route = createFileRoute("/")({
   component: HomePage,
@@ -9,20 +9,30 @@ export const Route = createFileRoute("/")({
 
 function HomePage() {
   const navigate = useNavigate();
-  const { workspace, isLoading: isWorkspaceLoading } = useWorkspace();
-  const { note, isLoading: isNoteLoading } = useFetchNoteById({
-    noteId: workspace?.lastNoteId,
-  });
+  const { notes, getNote } = useDataStore();
+  const {
+    workspace,
+    isLoadingWorkspace: isWorkspaceLoading,
+  } = useWorkspaceStore();
+
+  const noteId = workspace?.lastNoteId;
+  const note = noteId ? notes.find((n) => n.id === noteId) : null;
+
+  useEffect(() => {
+    // Load note if not in store
+    if (noteId && !note) {
+      getNote(noteId);
+    }
+  }, [noteId, note, getNote]);
 
   useEffect(() => {
     // Verify the note still exists and is not deleted
-    console.log("note", note);
     if (note && !note.deleted && workspace?.lastNoteId) {
       navigate({ to: "/n/$id", params: { id: workspace.lastNoteId } });
     }
   }, [note, workspace?.lastNoteId, navigate]);
 
-  if (isWorkspaceLoading || isNoteLoading) {
+  if (isWorkspaceLoading) {
     return null; // or a loading spinner
   }
 

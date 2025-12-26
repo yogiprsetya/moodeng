@@ -6,14 +6,15 @@ import {
   MenubarMenu,
   MenubarTrigger,
 } from "~/components/ui/menubar";
-import { useNotes } from "~/services/use-notes";
+import { useDataStore } from "~/stores/data-store";
+import { useWorkspaceStore } from "~/stores/data-workspace";
 import { ThemeSetting } from "./theme-setting";
 import { useEditorStore } from "~/stores/editor-store";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { Button } from "../ui/button";
 import { useSidebar } from "../ui/sidebar";
-import { useWorkspace } from "~/services/use-workspace";
-import { ButtonGroup } from "../ui/button-group";
+import { useNavigate } from "@tanstack/react-router";
+// import { ButtonGroup } from "../ui/button-group";
 import { useState, lazy, Suspense, useCallback } from "react";
 import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
@@ -26,14 +27,33 @@ const SettingsDialog = lazy(() =>
 
 export function Topbar() {
   const { syncStatus } = useEditorStore();
-  const { handleCreateNewNote, exportNoteAsMarkdown } = useNotes();
   const { toggleSidebar } = useSidebar();
-  const { workspace, refetch: refetchWorkspace } = useWorkspace();
+  const navigate = useNavigate();
+  const { createNote, getNote } = useDataStore();
+  const { workspace, loadWorkspace } = useWorkspaceStore();
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   // Get current note ID from route params (if on note page)
   const params = useParams({ strict: false });
   const noteId = params?.id as string | undefined;
+
+  const handleCreateNewNote = useCallback(
+    async (selectedFolder?: string | null) => {
+      const folderId = selectedFolder ?? null;
+      const newNote = await createNote({
+        title: "Untitled Note",
+        content: "",
+        folderId,
+        deleted: false,
+        syncStatus: "pending",
+        icon: "",
+        labelColor: "",
+        isPinned: false,
+      });
+      navigate({ to: "/n/$id", params: { id: newNote.id } });
+    },
+    [createNote, navigate]
+  );
 
   const handleExportMarkdown = useCallback(async () => {
     if (!noteId) {
@@ -41,13 +61,30 @@ export function Topbar() {
       return;
     }
     try {
-      await exportNoteAsMarkdown(noteId);
+      const note = await getNote(noteId);
+      if (!note) {
+        throw new Error("Note not found");
+      }
+
+      // Import utility functions
+      const { exportNoteToMarkdown, downloadFile } = await import(
+        "~/utils/export-note"
+      );
+
+      const markdown = exportNoteToMarkdown(note);
+      const sanitizedTitle = (note.title || "Untitled Note")
+        .replace(/[<>:"/\\|?*]/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .substring(0, 100);
+      const filename = `${sanitizedTitle}.md`;
+      downloadFile(markdown, filename, "text/markdown");
       toast.success("Note exported as Markdown");
     } catch (error) {
       toast.error("Failed to export note");
       console.error("Export error:", error);
     }
-  }, [noteId, exportNoteAsMarkdown]);
+  }, [noteId, getNote]);
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/95 backdrop-blur-md supports-backdrop-filter:bg-background/80">
@@ -109,7 +146,7 @@ export function Topbar() {
               </MenubarMenu>
             </Menubar>
 
-            <ButtonGroup>
+            {/* <ButtonGroup>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Button size="sm" variant="ghost" className="text-sm">
@@ -134,7 +171,7 @@ export function Topbar() {
                   uploaded to the cloud.
                 </TooltipContent>
               </Tooltip>
-            </ButtonGroup>
+            </ButtonGroup> */}
 
             <div className="flex items-center gap-2">
               <Tooltip open={syncStatus === "saving"}>
@@ -163,7 +200,7 @@ export function Topbar() {
             open={settingsOpen}
             onOpenChange={setSettingsOpen}
             currentTitle={workspace.title}
-            onSave={refetchWorkspace}
+            onSave={loadWorkspace}
           />
         </Suspense>
       )}
