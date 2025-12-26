@@ -17,7 +17,7 @@ const HistorySheet = lazy(() =>
 
 export const Editor = () => {
   const { id: noteId } = useParams({ strict: false });
-  const { getNote, updateNote, loadNotes } = useDataStore();
+  const { getNote, updateNote } = useDataStore();
   const { setSyncStatus } = useEditorStore();
 
   // Get note from store
@@ -42,8 +42,7 @@ export const Editor = () => {
             title: trimmedTitle,
             updatedAt: Date.now(),
           });
-          // Reload notes to update sidebar
-          await loadNotes();
+          // Store is automatically updated by updateNote, sidebar will reactively update
         } catch (err) {
           toast.error("Failed to update note title", {
             description:
@@ -54,7 +53,7 @@ export const Editor = () => {
         }
       }
     },
-    [noteId, updateNote, loadNotes]
+    [noteId, updateNote]
   );
 
   const updateContent = useCallback(
@@ -90,8 +89,7 @@ export const Editor = () => {
             folderId,
             updatedAt: Date.now(),
           });
-          // Reload notes to update sidebar
-          await loadNotes();
+          // Store is automatically updated by updateNote, sidebar will reactively update
         } catch (err) {
           toast.error("Failed to update note folder", {
             description:
@@ -102,7 +100,7 @@ export const Editor = () => {
         }
       }
     },
-    [noteId, updateNote, loadNotes]
+    [noteId, updateNote]
   );
 
   const content = note || null;
