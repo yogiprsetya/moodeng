@@ -23,6 +23,7 @@ interface DataStore {
 
   // Notes actions
   loadNotes: (includeDeleted?: boolean) => Promise<void>;
+  initNotesLoad: () => Promise<void>;
   createNote: (
     note: Omit<Note, "id" | "createdAt" | "updatedAt">
   ) => Promise<Note>;
@@ -36,6 +37,7 @@ interface DataStore {
 
   // Collections actions
   loadCollections: (includeDeleted?: boolean) => Promise<void>;
+  initCollectionLoad: () => Promise<void>;
   createCollection: (
     collection: Omit<Collection, "id" | "createdAt" | "updatedAt">
   ) => Promise<Collection>;
@@ -79,9 +81,21 @@ export const useDataStore = create<DataStore>()(
 
     // Notes actions
     loadNotes: async (includeDeleted = false) => {
-      set({ isLoadingNotes: true, notesError: null });
+      set({ notesError: null });
       try {
         const notes = await db.getAllNotes(includeDeleted);
+        set({ notes });
+      } catch (err) {
+        const error =
+          err instanceof Error ? err : new Error("Failed to load notes");
+        set({ notesError: error });
+      }
+    },
+
+    initNotesLoad: async () => {
+      set({ isLoadingNotes: true, notesError: null });
+      try {
+        const notes = await db.getAllNotes(false);
         set({ notes, isLoadingNotes: false });
       } catch (err) {
         const error =
@@ -188,9 +202,21 @@ export const useDataStore = create<DataStore>()(
 
     // Collections actions
     loadCollections: async (includeDeleted = false) => {
-      set({ isLoadingCollections: true, collectionsError: null });
+      set({ collectionsError: null });
       try {
         const collections = await db.getAllCollections(includeDeleted);
+        set({ collections });
+      } catch (err) {
+        const error =
+          err instanceof Error ? err : new Error("Failed to load collections");
+        set({ collectionsError: error });
+      }
+    },
+
+    initCollectionLoad: async () => {
+      set({ isLoadingCollections: true, collectionsError: null });
+      try {
+        const collections = await db.getAllCollections(false);
         set({ collections, isLoadingCollections: false });
       } catch (err) {
         const error =
@@ -307,7 +333,7 @@ export const useDataStore = create<DataStore>()(
     // Utility actions
     initialize: async () => {
       // Load all data on initialization
-      await Promise.all([get().loadNotes(), get().loadCollections()]);
+      await Promise.all([get().initNotesLoad(), get().initCollectionLoad()]);
     },
 
     clearErrors: () => {

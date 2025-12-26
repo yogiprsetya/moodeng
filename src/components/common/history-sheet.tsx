@@ -110,8 +110,8 @@ export function HistorySheet(props: {
 
         <Separator />
 
-        <ScrollArea className="flex-1">
-          <div className="p-4 space-y-3">
+        <ScrollArea className="h-[calc(100%-128px)]">
+          <div className="p-4 space-y-3 pb-6">
             {histories.length === 0 ? (
               <div className="text-sm text-muted-foreground">{emptyText}</div>
             ) : (

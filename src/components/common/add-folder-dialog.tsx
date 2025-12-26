@@ -10,19 +10,13 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useDataStore } from "~/stores/data-store";
-import type { Collection } from "~/types/note";
 
 interface AddFolderDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onFolderCreated?: (folder: Collection) => void;
 }
 
-export function AddFolderDialog({
-  open,
-  onOpenChange,
-  onFolderCreated,
-}: AddFolderDialogProps) {
+export function AddFolderDialog({ open, onOpenChange }: AddFolderDialogProps) {
   const [folderName, setFolderName] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const { createCollection } = useDataStore();
@@ -34,14 +28,13 @@ export function AddFolderDialog({
 
     setIsCreating(true);
     try {
-      const newCollection = await createCollection({
+      createCollection({
         name: folderName.trim(),
         deleted: false,
         syncStatus: "pending",
         icon: "",
         labelColor: "",
       });
-      onFolderCreated?.(newCollection);
       setFolderName("");
       onOpenChange(false);
     } catch (err) {
@@ -91,6 +84,7 @@ export function AddFolderDialog({
           >
             Cancel
           </Button>
+
           <Button
             onClick={handleCreate}
             disabled={!folderName.trim() || isCreating}

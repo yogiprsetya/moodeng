@@ -62,9 +62,7 @@ export function SidebarContent() {
     createNote,
     deleteNote,
     togglePinNote,
-    loadNotes,
     deleteCollectionWithNotes,
-    loadCollections,
   } = useDataStore();
 
   const handleCreateNewNote = async (selectedFolder?: string | null) => {
@@ -223,7 +221,7 @@ export function SidebarContent() {
                       onClick={() => setSelectedFolder(collection.id)}
                       isActive={selectedFolder === collection.id}
                     >
-                      <Folder className="size-4" />
+                      <Folder />
                       <span>{collection.name}</span>
                     </SidebarMenuButton>
 
@@ -363,11 +361,6 @@ export function SidebarContent() {
         <AddFolderDialog
           open={isAddFolderOpen}
           onOpenChange={setIsAddFolderOpen}
-          onFolderCreated={() => {
-            // Reload collections and notes to update the sidebar
-            loadCollections();
-            loadNotes();
-          }}
         />
       </Suspense>
     </SidebarContentWrapper>
