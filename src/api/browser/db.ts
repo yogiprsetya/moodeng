@@ -1,17 +1,19 @@
 import type { Note } from "~/types/note";
 import type { Collection } from "~/types/note";
 import type { Workspace } from "~/types/workspace";
-import type { History, HistoryType } from "~/types/history";
+import type { History } from "~/types/history";
 import { DBDriver } from "./db-driver";
 import { WorkspaceRepository } from "./workspace-repository";
 import { NotesRepository } from "./notes-repository";
 import { CollectionsRepository } from "./collections-repository";
 import { DBMaintenance } from "./db-maintenance";
 import { HistoriesRepository } from "./histories-repository";
+import { HistoryService } from "./history-service";
 
 /**
  * LocalDB is a facade that provides a unified interface to all repositories.
  * It delegates operations to specialized repository classes.
+ * History logging is handled by a separate HistoryService to maintain separation of concerns.
  */
 export class LocalDB {
   private database: DBDriver;
@@ -20,6 +22,7 @@ export class LocalDB {
   public readonly collections: CollectionsRepository;
   public readonly histories: HistoriesRepository;
   public readonly maintenance: DBMaintenance;
+  private historyService: HistoryService;
 
   constructor(database?: DBDriver) {
     this.database = database ?? new DBDriver();
@@ -28,23 +31,7 @@ export class LocalDB {
     this.collections = new CollectionsRepository(this.database);
     this.histories = new HistoriesRepository(this.database);
     this.maintenance = new DBMaintenance(this.database);
-  }
-
-  private async appendHistory(params: {
-    noteId: string;
-    type: HistoryType;
-    payload: Record<string, unknown>;
-  }): Promise<void> {
-    const history: History = {
-      id: crypto.randomUUID(),
-      noteId: params.noteId,
-      type: params.type,
-      payload: params.payload,
-      createdAt: Date.now(),
-      deleted: false,
-      syncStatus: "pending",
-    };
-    await this.histories.create(history);
+    this.historyService = new HistoryService(this.histories);
   }
 
   // ==================== WORKSPACE CRUD (delegated) ====================
@@ -77,14 +64,7 @@ export class LocalDB {
    */
   async createNote(note: Note): Promise<Note> {
     const created = await this.notes.create(note);
-    await this.appendHistory({
-      noteId: created.id,
-      type: "created",
-      payload: {
-        title: created.title,
-        folderId: created.folderId,
-      },
-    });
+    await this.historyService.logNoteCreated(created);
     return created;
   }
 
@@ -124,36 +104,7 @@ export class LocalDB {
     const updated = await this.notes.update(id, updates);
 
     if (before) {
-      const moved =
-        typeof updates.folderId !== "undefined" &&
-        before.folderId !== updated.folderId;
-      const toggledDeleted =
-        typeof updates.deleted !== "undefined" &&
-        before.deleted !== updated.deleted;
-
-      let type: HistoryType = "updated";
-      if (toggledDeleted) type = updated.deleted ? "deleted" : "restored";
-      else if (moved) type = "moved";
-
-      await this.appendHistory({
-        noteId: updated.id,
-        type,
-        payload: {
-          before: {
-            title: before.title,
-            folderId: before.folderId,
-            deleted: before.deleted,
-            isPinned: before.isPinned,
-          },
-          updates,
-          after: {
-            title: updated.title,
-            folderId: updated.folderId,
-            deleted: updated.deleted,
-            isPinned: updated.isPinned,
-          },
-        },
-      });
+      await this.historyService.logNoteUpdated(before, updated, updates);
     }
 
     return updated;
@@ -168,11 +119,7 @@ export class LocalDB {
 
     // only log soft-delete (hard delete removes record)
     if (!hardDelete && before) {
-      await this.appendHistory({
-        noteId: id,
-        type: "deleted",
-        payload: { hardDelete: false },
-      });
+      await this.historyService.logNoteDeleted(id);
     }
   }
 
@@ -181,11 +128,7 @@ export class LocalDB {
    */
   async restoreNote(id: string): Promise<Note> {
     const restored = await this.notes.restore(id);
-    await this.appendHistory({
-      noteId: id,
-      type: "restored",
-      payload: {},
-    });
+    await this.historyService.logNoteRestored(id);
     return restored;
   }
 

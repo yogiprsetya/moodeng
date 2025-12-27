@@ -14,6 +14,7 @@ interface BaseEntity {
 
 /**
  * Generic helper to update an item in an array
+ * Returns the same array reference if the item is unchanged to avoid unnecessary re-renders
  */
 function updateItemInArray<T extends BaseEntity>(
   array: T[],
@@ -22,18 +23,24 @@ function updateItemInArray<T extends BaseEntity>(
 ): T[] {
   const index = array.findIndex((item) => item.id === id);
   if (index !== -1) {
+    // Check if the item actually changed to avoid unnecessary array copy
+    if (array[index] === updated) {
+      return array;
+    }
     const updatedArray = [...array];
     updatedArray[index] = updated;
     return updatedArray;
   }
-  return [...array, updated];
+  // Item doesn't exist, add it to the end (no need to spread entire array)
+  return array.concat([updated]);
 }
 
 /**
  * Generic helper to add an item to an array
+ * Uses concat for better performance when adding a single item
  */
 function addItemToArray<T extends BaseEntity>(array: T[], item: T): T[] {
-  return [...array, item];
+  return array.concat([item]);
 }
 
 /**
@@ -48,6 +55,7 @@ function removeItemFromArray<T extends BaseEntity>(
 
 /**
  * Generic helper to soft delete an item in an array
+ * Returns the same array reference if item is already deleted or doesn't exist
  */
 function softDeleteItemInArray<T extends BaseEntity & { deleted: boolean }>(
   array: T[],
@@ -55,6 +63,10 @@ function softDeleteItemInArray<T extends BaseEntity & { deleted: boolean }>(
 ): T[] {
   const index = array.findIndex((item) => item.id === id);
   if (index !== -1) {
+    // Check if already deleted to avoid unnecessary array copy
+    if (array[index].deleted) {
+      return array;
+    }
     const updatedArray = [...array];
     updatedArray[index] = { ...updatedArray[index], deleted: true };
     return updatedArray;
@@ -178,9 +190,14 @@ export const useDataStore = create<DataStore>()(
     getNote: async (id: string) => {
       const note = await db.getNote(id);
       if (note) {
-        // Update the note in the store if it exists
         const { notes } = get();
-        set({ notes: updateItemInArray(notes, id, note) });
+        const existingNote = notes.find((n) => n.id === id);
+
+        // Only update store if note doesn't exist or has actually changed
+        // Check updatedAt timestamp to avoid unnecessary updates
+        if (!existingNote || existingNote.updatedAt !== note.updatedAt) {
+          set({ notes: updateItemInArray(notes, id, note) });
+        }
       }
       return note;
     },

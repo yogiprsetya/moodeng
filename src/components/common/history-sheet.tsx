@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { useParams } from "@tanstack/react-router";
 import { Clock } from "lucide-react";
 import { ScrollArea } from "~/components/ui/scroll-area";
@@ -11,7 +11,6 @@ import {
   SheetTitle,
 } from "~/components/ui/sheet";
 import { useDataStore } from "~/stores/data-store";
-import { useEffect } from "react";
 import type { History } from "~/types/history";
 import { cn } from "~/utils/css";
 
@@ -82,11 +81,72 @@ export function HistorySheet(props: {
     histories,
     isLoadingHistories: isLoading,
     loadHistories,
+    notes,
   } = useDataStore();
 
+  // Get the current note to watch for updates
+  const currentNote = noteId ? notes.find((n) => n.id === noteId) : null;
+
+  // Track the last updatedAt we've seen to avoid unnecessary reloads
+  const lastUpdatedAtRef = useRef<number | null>(null);
+  const lastNotesSignatureRef = useRef<string | null>(null);
+  const hasInitializedRef = useRef(false);
+
+  // Reload histories when sheet opens or noteId changes
   useEffect(() => {
+    if (!props.open) {
+      // Reset tracking when sheet closes
+      lastUpdatedAtRef.current = null;
+      lastNotesSignatureRef.current = null;
+      hasInitializedRef.current = false;
+      return;
+    }
+
+    // Load histories when sheet opens or noteId changes
     loadHistories(noteId, 200);
-  }, [noteId, loadHistories]);
+    hasInitializedRef.current = true;
+
+    // Initialize tracking for current note if available
+    if (currentNote) {
+      lastUpdatedAtRef.current = currentNote.updatedAt;
+    } else {
+      lastUpdatedAtRef.current = null;
+    }
+  }, [props.open, noteId, loadHistories, currentNote]);
+
+  // Reload histories when the current note is updated (only after initial load)
+  useEffect(() => {
+    if (!props.open || !hasInitializedRef.current) return;
+
+    if (currentNote) {
+      const currentUpdatedAt = currentNote.updatedAt;
+      const lastUpdatedAt = lastUpdatedAtRef.current;
+
+      // Only reload if updatedAt has actually changed
+      if (lastUpdatedAt !== null && currentUpdatedAt !== lastUpdatedAt) {
+        loadHistories(noteId, 200);
+        lastUpdatedAtRef.current = currentUpdatedAt;
+      }
+    }
+  }, [props.open, noteId, loadHistories, currentNote]);
+
+  // For recent histories (no noteId), reload when any note changes
+  useEffect(() => {
+    if (!props.open || noteId) return;
+
+    // Watch for changes in notes array (new notes, updates, etc.)
+    // We'll reload recent histories when notes change
+    const notesCount = notes.length;
+    const maxUpdatedAt = Math.max(...notes.map((n) => n.updatedAt), 0);
+
+    // Use a combination of count and max updatedAt to detect changes
+    const notesSignature = `${notesCount}-${maxUpdatedAt}`;
+
+    if (lastNotesSignatureRef.current !== notesSignature) {
+      loadHistories(undefined, 200);
+      lastNotesSignatureRef.current = notesSignature;
+    }
+  }, [props.open, noteId, notes, loadHistories]);
 
   const emptyText = useMemo(() => {
     if (!noteId) return "Open a note to see its history.";
