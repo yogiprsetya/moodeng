@@ -10,6 +10,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { useDataStore } from "~/stores/data-store";
+import { toast } from "sonner";
 
 interface AddFolderDialogProps {
   open: boolean;
@@ -28,7 +29,7 @@ export function AddFolderDialog({ open, onOpenChange }: AddFolderDialogProps) {
 
     setIsCreating(true);
     try {
-      createCollection({
+      await createCollection({
         name: folderName.trim(),
         deleted: false,
         syncStatus: "pending",
@@ -38,7 +39,10 @@ export function AddFolderDialog({ open, onOpenChange }: AddFolderDialogProps) {
       setFolderName("");
       onOpenChange(false);
     } catch (err) {
-      console.error("Error creating folder:", err);
+      toast.error("Failed to create folder", {
+        description:
+          err instanceof Error ? err.message : "An unexpected error occurred",
+      });
     } finally {
       setIsCreating(false);
     }
