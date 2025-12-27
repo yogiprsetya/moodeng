@@ -97,11 +97,12 @@ export function SidebarContent() {
 
   const filteredNotes = useMemo(() => {
     const filtered = notes.filter((note) => {
+      const notDeleted = !note.deleted;
       const matchesSearch =
         !searchQuery ||
         note.title.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesFolder = !selectedFolder || note.folderId === selectedFolder;
-      return matchesSearch && matchesFolder;
+      return notDeleted && matchesSearch && matchesFolder;
     });
 
     // Sort: pinned notes first, then by updatedAt (most recent first)
@@ -141,7 +142,9 @@ export function SidebarContent() {
 
     // Navigate away if we're currently viewing the deleted note
     if (currentNoteId === deleteNoteId) {
-      const remainingNotes = notes.filter((note) => note.id !== deleteNoteId);
+      const remainingNotes = notes.filter(
+        (note) => !note.deleted && note.id !== deleteNoteId
+      );
       if (remainingNotes.length > 0) {
         navigate({ to: "/n/$id", params: { id: remainingNotes[0].id } });
       } else {
@@ -162,7 +165,7 @@ export function SidebarContent() {
       const currentNote = notes.find((note) => note.id === currentNoteId);
       if (currentNote?.folderId === deleteCollectionId) {
         const remainingNotes = notes.filter(
-          (note) => note.folderId !== deleteCollectionId
+          (note) => !note.deleted && note.folderId !== deleteCollectionId
         );
         if (remainingNotes.length > 0) {
           navigate({ to: "/n/$id", params: { id: remainingNotes[0].id } });

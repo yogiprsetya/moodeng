@@ -5,6 +5,63 @@ import type { Collection } from "~/types/note";
 import type { History } from "~/types/history";
 import { devtools } from "zustand/middleware";
 
+interface BaseEntity {
+  id: string;
+  createdAt: number;
+  updatedAt: number;
+  deleted: boolean;
+}
+
+/**
+ * Generic helper to update an item in an array
+ */
+function updateItemInArray<T extends BaseEntity>(
+  array: T[],
+  id: string,
+  updated: T
+): T[] {
+  const index = array.findIndex((item) => item.id === id);
+  if (index !== -1) {
+    const updatedArray = [...array];
+    updatedArray[index] = updated;
+    return updatedArray;
+  }
+  return [...array, updated];
+}
+
+/**
+ * Generic helper to add an item to an array
+ */
+function addItemToArray<T extends BaseEntity>(array: T[], item: T): T[] {
+  return [...array, item];
+}
+
+/**
+ * Generic helper to remove an item from an array
+ */
+function removeItemFromArray<T extends BaseEntity>(
+  array: T[],
+  id: string
+): T[] {
+  return array.filter((item) => item.id !== id);
+}
+
+/**
+ * Generic helper to soft delete an item in an array
+ */
+function softDeleteItemInArray<T extends BaseEntity & { deleted: boolean }>(
+  array: T[],
+  id: string
+): T[] {
+  const index = array.findIndex((item) => item.id === id);
+  if (index !== -1) {
+    const updatedArray = [...array];
+    updatedArray[index] = { ...updatedArray[index], deleted: true };
+    return updatedArray;
+  }
+  return array;
+}
+
 interface DataStore {
   // State
   notes: Note[];
@@ -114,7 +171,7 @@ export const useDataStore = create<DataStore>()(
 
       const created = await db.createNote(newNote);
       const { notes } = get();
-      set({ notes: [...notes, created] });
+      set({ notes: addItemToArray(notes, created) });
       return created;
     },
 
@@ -123,14 +180,7 @@ export const useDataStore = create<DataStore>()(
       if (note) {
         // Update the note in the store if it exists
         const { notes } = get();
-        const index = notes.findIndex((n) => n.id === id);
-        if (index !== -1) {
-          const updatedNotes = [...notes];
-          updatedNotes[index] = note;
-          set({ notes: updatedNotes });
-        } else {
-          set({ notes: [...notes, note] });
-        }
+        set({ notes: updateItemInArray(notes, id, note) });
       }
       return note;
     },
@@ -138,16 +188,7 @@ export const useDataStore = create<DataStore>()(
     updateNote: async (id: string, updates: Partial<Note>) => {
       const updated = await db.updateNote(id, updates);
       const { notes } = get();
-      const index = notes.findIndex((n) => n.id === id);
-
-      if (index !== -1) {
-        const updatedNotes = [...notes];
-        updatedNotes[index] = updated;
-        set({ notes: updatedNotes });
-      } else {
-        set({ notes: [...notes, updated] });
-      }
-
+      set({ notes: updateItemInArray(notes, id, updated) });
       return updated;
     },
 
@@ -156,31 +197,17 @@ export const useDataStore = create<DataStore>()(
       const { notes } = get();
 
       if (hardDelete) {
-        set({ notes: notes.filter((n) => n.id !== id) });
+        set({ notes: removeItemFromArray(notes, id) });
       } else {
         // Soft delete - update the note
-        const index = notes.findIndex((n) => n.id === id);
-        if (index !== -1) {
-          const updatedNotes = [...notes];
-          updatedNotes[index] = { ...updatedNotes[index], deleted: true };
-          set({ notes: updatedNotes });
-        }
+        set({ notes: softDeleteItemInArray(notes, id) });
       }
     },
 
     restoreNote: async (id: string) => {
       const restored = await db.restoreNote(id);
       const { notes } = get();
-      const index = notes.findIndex((n) => n.id === id);
-
-      if (index !== -1) {
-        const updatedNotes = [...notes];
-        updatedNotes[index] = restored;
-        set({ notes: updatedNotes });
-      } else {
-        set({ notes: [...notes, restored] });
-      }
-
+      set({ notes: updateItemInArray(notes, id, restored) });
       return restored;
     },
 
@@ -235,7 +262,7 @@ export const useDataStore = create<DataStore>()(
 
       const created = await db.createCollection(newCollection);
       const { collections } = get();
-      set({ collections: [...collections, created] });
+      set({ collections: addItemToArray(collections, created) });
       return created;
     },
 
@@ -246,16 +273,7 @@ export const useDataStore = create<DataStore>()(
     updateCollection: async (id: string, updates: Partial<Collection>) => {
       const updated = await db.updateCollection(id, updates);
       const { collections } = get();
-      const index = collections.findIndex((c) => c.id === id);
-
-      if (index !== -1) {
-        const updatedCollections = [...collections];
-        updatedCollections[index] = updated;
-        set({ collections: updatedCollections });
-      } else {
-        set({ collections: [...collections, updated] });
-      }
-
+      set({ collections: updateItemInArray(collections, id, updated) });
       return updated;
     },
 
@@ -264,18 +282,10 @@ export const useDataStore = create<DataStore>()(
       const { collections } = get();
 
       if (hardDelete) {
-        set({ collections: collections.filter((c) => c.id !== id) });
+        set({ collections: removeItemFromArray(collections, id) });
       } else {
         // Soft delete - update the collection
-        const index = collections.findIndex((c) => c.id === id);
-        if (index !== -1) {
-          const updatedCollections = [...collections];
-          updatedCollections[index] = {
-            ...updatedCollections[index],
-            deleted: true,
-          };
-          set({ collections: updatedCollections });
-        }
+        set({ collections: softDeleteItemInArray(collections, id) });
       }
     },
 
@@ -294,16 +304,7 @@ export const useDataStore = create<DataStore>()(
     restoreCollection: async (id: string) => {
       const restored = await db.restoreCollection(id);
       const { collections } = get();
-      const index = collections.findIndex((c) => c.id === id);
-
-      if (index !== -1) {
-        const updatedCollections = [...collections];
-        updatedCollections[index] = restored;
-        set({ collections: updatedCollections });
-      } else {
-        set({ collections: [...collections, restored] });
-      }
-
+      set({ collections: updateItemInArray(collections, id, restored) });
       return restored;
     },
 
