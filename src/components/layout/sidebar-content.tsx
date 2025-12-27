@@ -221,7 +221,13 @@ export function SidebarContent() {
                 collections.map((collection) => (
                   <SidebarMenuItem key={collection.id}>
                     <SidebarMenuButton
-                      onClick={() => setSelectedFolder(collection.id)}
+                      onClick={() =>
+                        setSelectedFolder(
+                          selectedFolder === collection.id
+                            ? null
+                            : collection.id
+                        )
+                      }
                       isActive={selectedFolder === collection.id}
                     >
                       <Folder />
