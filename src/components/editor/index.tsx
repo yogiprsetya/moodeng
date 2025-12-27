@@ -3,8 +3,8 @@ import { TitleEditor } from "./title-editor";
 import { FolderSelector } from "./folder-selector";
 import { useParams } from "@tanstack/react-router";
 import { useState, lazy, Suspense, useCallback, useEffect } from "react";
-import { toast } from "sonner";
 import { useDataStore } from "~/stores/data-store";
+import { handleError } from "~/utils/error-handle";
 import { useEditorStore } from "~/stores/editor-store";
 import { Button } from "~/components/ui/button";
 import { Clock } from "lucide-react";
@@ -44,12 +44,7 @@ export const Editor = () => {
           });
           // Store is automatically updated by updateNote, sidebar will reactively update
         } catch (err) {
-          toast.error("Failed to update note title", {
-            description:
-              err instanceof Error
-                ? err.message
-                : "An unexpected error occurred",
-          });
+          handleError(err);
         }
       }
     },
@@ -67,12 +62,7 @@ export const Editor = () => {
             updatedAt: Date.now(),
           });
         } catch (err) {
-          toast.error("Failed to update note content", {
-            description:
-              err instanceof Error
-                ? err.message
-                : "An unexpected error occurred",
-          });
+          handleError(err);
         } finally {
           setTimeout(() => setSyncStatus("saved"), 1000);
         }
@@ -91,12 +81,7 @@ export const Editor = () => {
           });
           // Store is automatically updated by updateNote, sidebar will reactively update
         } catch (err) {
-          toast.error("Failed to update note folder", {
-            description:
-              err instanceof Error
-                ? err.message
-                : "An unexpected error occurred",
-          });
+          handleError(err);
         }
       }
     },

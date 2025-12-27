@@ -18,6 +18,7 @@ import { useNavigate } from "@tanstack/react-router";
 import { useState, lazy, Suspense, useCallback } from "react";
 import { useParams } from "@tanstack/react-router";
 import { toast } from "sonner";
+import { handleError } from "~/utils/error-handle";
 
 const SettingsDialog = lazy(() =>
   import("../common/settings-dialog").then((module) => ({
@@ -81,8 +82,7 @@ export function Topbar() {
       downloadFile(markdown, filename, "text/markdown");
       toast.success("Note exported as Markdown");
     } catch (error) {
-      toast.error("Failed to export note");
-      console.error("Export error:", error);
+      handleError(error);
     }
   }, [noteId, getNote]);
 

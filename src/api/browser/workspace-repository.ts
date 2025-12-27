@@ -17,7 +17,7 @@ export class WorkspaceRepository {
   private createDefaultWorkspace(): Workspace {
     return {
       clientId: crypto.randomUUID(),
-      theme: "default",
+      theme: "miro",
       darkmode: false,
       title: "My Workspace",
       lastNoteId: null,
@@ -29,7 +29,7 @@ export class WorkspaceRepository {
    */
   async get(): Promise<Workspace | null> {
     const db = await this.database.getDB();
-    
+
     // First, try to get existing workspace
     const workspace = await new Promise<Workspace | null>((resolve, reject) => {
       const transaction = db.transaction([STORES.WORKSPACE], "readonly");

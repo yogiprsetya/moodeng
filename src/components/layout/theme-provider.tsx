@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useWorkspaceStore } from "~/stores/data-workspace";
 import { loadThemeCSS } from "~/utils/theme-loader";
+import { handleError } from "~/utils/error-handle";
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const { currentTheme, colorScheme, applyTheme } = useWorkspaceStore();
@@ -12,9 +13,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       applyTheme();
     };
 
-    initializeTheme().catch((err) => {
-      console.error("Failed to load theme CSS:", err);
-    });
+    initializeTheme().catch(handleError);
 
     // Listen for system theme changes
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");

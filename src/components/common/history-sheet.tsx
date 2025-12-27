@@ -1,8 +1,8 @@
 import { useMemo, useEffect, useRef } from "react";
 import { useParams } from "@tanstack/react-router";
 import { Clock } from "lucide-react";
-import { toast } from "sonner";
 import { ScrollArea } from "~/components/ui/scroll-area";
+import { handleError } from "~/utils/error-handle";
 import { Separator } from "~/components/ui/separator";
 import {
   Sheet,
@@ -125,15 +125,7 @@ export function HistorySheet(props: {
 
     if (shouldInitialize) {
       // Load histories when sheet opens or noteId changes
-      loadHistories(noteId, HISTORY_LIMIT).catch((error) => {
-        console.error("Failed to load histories:", error);
-        toast.error("Failed to load history", {
-          description:
-            error instanceof Error
-              ? error.message
-              : "An unexpected error occurred",
-        });
-      });
+      loadHistories(noteId, HISTORY_LIMIT).catch(handleError);
       hasInitializedRef.current = true;
 
       // Initialize tracking refs with current values (used for initialization only)
@@ -160,15 +152,7 @@ export function HistorySheet(props: {
     if (noteId && currentNoteUpdatedAt !== undefined) {
       const lastUpdatedAt = lastUpdatedAtRef.current;
       if (lastUpdatedAt !== null && currentNoteUpdatedAt !== lastUpdatedAt) {
-        loadHistories(noteId, HISTORY_LIMIT).catch((error) => {
-          console.error("Failed to reload histories:", error);
-          toast.error("Failed to reload history", {
-            description:
-              error instanceof Error
-                ? error.message
-                : "An unexpected error occurred",
-          });
-        });
+        loadHistories(noteId, HISTORY_LIMIT).catch(handleError);
         lastUpdatedAtRef.current = currentNoteUpdatedAt;
       }
     }
@@ -176,15 +160,7 @@ export function HistorySheet(props: {
     // Handle recent histories updates
     if (!noteId && notesSignature !== null) {
       if (lastNotesSignatureRef.current !== notesSignature) {
-        loadHistories(undefined, HISTORY_LIMIT).catch((error) => {
-          console.error("Failed to reload recent histories:", error);
-          toast.error("Failed to reload history", {
-            description:
-              error instanceof Error
-                ? error.message
-                : "An unexpected error occurred",
-          });
-        });
+        loadHistories(undefined, HISTORY_LIMIT).catch(handleError);
         lastNotesSignatureRef.current = notesSignature;
       }
     }
