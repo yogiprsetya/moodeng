@@ -1,6 +1,7 @@
 import { useMemo, useEffect, useRef } from "react";
 import { useParams } from "@tanstack/react-router";
 import { Clock } from "lucide-react";
+import { toast } from "sonner";
 import { ScrollArea } from "~/components/ui/scroll-area";
 import { Separator } from "~/components/ui/separator";
 import {
@@ -13,6 +14,8 @@ import {
 import { useDataStore } from "~/stores/data-store";
 import type { History } from "~/types/history";
 import { cn } from "~/utils/css";
+
+const HISTORY_LIMIT = 200;
 
 function formatTime(ts: number) {
   try {
@@ -77,76 +80,115 @@ export function HistorySheet(props: {
   const params = useParams({ strict: false });
   const noteId = params?.id as string | undefined;
 
-  const {
-    histories,
-    isLoadingHistories: isLoading,
-    loadHistories,
-    notes,
-  } = useDataStore();
+  const histories = useDataStore((state) => state.histories);
+  const isLoading = useDataStore((state) => state.isLoadingHistories);
+  const loadHistories = useDataStore((state) => state.loadHistories);
 
-  // Get the current note to watch for updates
-  const currentNote = noteId ? notes.find((n) => n.id === noteId) : null;
+  // Only track the updatedAt value, not the entire object
+  // This avoids unstable object references in useEffect dependencies
+  const currentNoteUpdatedAt = useDataStore((state) =>
+    noteId ? state.notes.find((n) => n.id === noteId)?.updatedAt : undefined
+  );
+
+  // For recent histories, compute signature in selector to avoid watching entire array
+  // This is more efficient than watching the entire notes array
+  const notesSignature = useDataStore((state) => {
+    if (noteId) return null; // Not needed for specific note view
+    const notes = state.notes;
+    const count = notes.length;
+    const maxUpdatedAt =
+      notes.length > 0 ? Math.max(...notes.map((n) => n.updatedAt)) : 0;
+    return `${count}-${maxUpdatedAt}`;
+  });
 
   // Track the last updatedAt we've seen to avoid unnecessary reloads
   const lastUpdatedAtRef = useRef<number | null>(null);
   const lastNotesSignatureRef = useRef<string | null>(null);
   const hasInitializedRef = useRef(false);
+  const lastNoteIdRef = useRef<string | undefined>(undefined);
 
-  // Reload histories when sheet opens or noteId changes
+  // Effect 1: Handle initialization and reset when sheet opens/closes or noteId changes
   useEffect(() => {
     if (!props.open) {
       // Reset tracking when sheet closes
       lastUpdatedAtRef.current = null;
       lastNotesSignatureRef.current = null;
       hasInitializedRef.current = false;
+      lastNoteIdRef.current = undefined;
       return;
     }
 
-    // Load histories when sheet opens or noteId changes
-    loadHistories(noteId, 200);
-    hasInitializedRef.current = true;
+    // Only reload if noteId actually changed or sheet just opened
+    const noteIdChanged = lastNoteIdRef.current !== noteId;
+    const shouldInitialize = noteIdChanged || !hasInitializedRef.current;
+    lastNoteIdRef.current = noteId;
 
-    // Initialize tracking for current note if available
-    if (currentNote) {
-      lastUpdatedAtRef.current = currentNote.updatedAt;
-    } else {
-      lastUpdatedAtRef.current = null;
+    if (shouldInitialize) {
+      // Load histories when sheet opens or noteId changes
+      loadHistories(noteId, HISTORY_LIMIT).catch((error) => {
+        console.error("Failed to load histories:", error);
+        toast.error("Failed to load history", {
+          description:
+            error instanceof Error
+              ? error.message
+              : "An unexpected error occurred",
+        });
+      });
+      hasInitializedRef.current = true;
+
+      // Initialize tracking refs with current values (used for initialization only)
+      if (currentNoteUpdatedAt !== undefined) {
+        lastUpdatedAtRef.current = currentNoteUpdatedAt;
+      } else {
+        lastUpdatedAtRef.current = null;
+      }
+
+      if (!noteId && notesSignature !== null) {
+        lastNotesSignatureRef.current = notesSignature;
+      }
     }
-  }, [props.open, noteId, loadHistories, currentNote]);
+    // currentNoteUpdatedAt and notesSignature are intentionally excluded - we only
+    // use them for initialization, not as triggers for this effect
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.open, noteId, loadHistories]);
 
-  // Reload histories when the current note is updated (only after initial load)
+  // Effect 2: Handle updates after initialization (note updates or recent histories changes)
   useEffect(() => {
     if (!props.open || !hasInitializedRef.current) return;
 
-    if (currentNote) {
-      const currentUpdatedAt = currentNote.updatedAt;
+    // Handle specific note updates
+    if (noteId && currentNoteUpdatedAt !== undefined) {
       const lastUpdatedAt = lastUpdatedAtRef.current;
-
-      // Only reload if updatedAt has actually changed
-      if (lastUpdatedAt !== null && currentUpdatedAt !== lastUpdatedAt) {
-        loadHistories(noteId, 200);
-        lastUpdatedAtRef.current = currentUpdatedAt;
+      if (lastUpdatedAt !== null && currentNoteUpdatedAt !== lastUpdatedAt) {
+        loadHistories(noteId, HISTORY_LIMIT).catch((error) => {
+          console.error("Failed to reload histories:", error);
+          toast.error("Failed to reload history", {
+            description:
+              error instanceof Error
+                ? error.message
+                : "An unexpected error occurred",
+          });
+        });
+        lastUpdatedAtRef.current = currentNoteUpdatedAt;
       }
     }
-  }, [props.open, noteId, loadHistories, currentNote]);
 
-  // For recent histories (no noteId), reload when any note changes
-  useEffect(() => {
-    if (!props.open || noteId) return;
-
-    // Watch for changes in notes array (new notes, updates, etc.)
-    // We'll reload recent histories when notes change
-    const notesCount = notes.length;
-    const maxUpdatedAt = Math.max(...notes.map((n) => n.updatedAt), 0);
-
-    // Use a combination of count and max updatedAt to detect changes
-    const notesSignature = `${notesCount}-${maxUpdatedAt}`;
-
-    if (lastNotesSignatureRef.current !== notesSignature) {
-      loadHistories(undefined, 200);
-      lastNotesSignatureRef.current = notesSignature;
+    // Handle recent histories updates
+    if (!noteId && notesSignature !== null) {
+      if (lastNotesSignatureRef.current !== notesSignature) {
+        loadHistories(undefined, HISTORY_LIMIT).catch((error) => {
+          console.error("Failed to reload recent histories:", error);
+          toast.error("Failed to reload history", {
+            description:
+              error instanceof Error
+                ? error.message
+                : "An unexpected error occurred",
+          });
+        });
+        lastNotesSignatureRef.current = notesSignature;
+      }
     }
-  }, [props.open, noteId, notes, loadHistories]);
+  }, [props.open, noteId, loadHistories, currentNoteUpdatedAt, notesSignature]);
 
   const emptyText = useMemo(() => {
     if (!noteId) return "Open a note to see its history.";
