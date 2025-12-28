@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { db } from "~/api/browser/db";
+import { db } from "~/api/db";
 import type { Workspace } from "~/types/workspace";
 import type { ColorScheme, ThemeName } from "~/types/theme";
 
@@ -132,4 +132,3 @@ export const useWorkspaceStore = create<WorkspaceStore>()(
     }
   )
 );
-

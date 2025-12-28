@@ -20,9 +20,7 @@ export default defineConfig({
   resolve: {
     alias: {
       "~": path.resolve(__dirname, "./src"),
-      "@browser": path.resolve(__dirname, "./src/services/browser"),
-      "@firebase": path.resolve(__dirname, "./src/services/firebase"),
-      "@adapters": path.resolve(__dirname, "./src/adapters"),
+      "~/api": path.resolve(__dirname, "./src/api/browser"),
     },
   },
 });

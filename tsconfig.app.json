@@ -27,9 +27,7 @@
     "baseUrl": ".",
     "paths": {
       "~/*": ["./src/*"],
-      "@browser/*": ["src/api/browser/*"],
-      "@firebase/*": ["src/api/firebase/*"],
-      "@adapters/*": ["./src/adapters/*"]
+      "@api/*": ["src/api/*"]
     }
   },
   "include": ["src"]

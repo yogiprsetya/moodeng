@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { db } from "~/api/browser/db";
+import { db } from "~/api/db";
 import type { Note } from "~/types/note";
 import type { Collection } from "~/types/note";
 import type { History } from "~/types/history";
